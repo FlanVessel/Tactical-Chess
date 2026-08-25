@@ -148,21 +148,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b32b0800f1731c4a8c63d81d2d176fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilemapControlller
-  mapSize:
-  - {x: 10, y: 50}
-  - {x: 12, y: 73}
-  - {x: 23, y: 51}
-  - {x: 67, y: 23}
-  mapOrigin:
-  - {x: 0, y: 0}
-  - {x: 14, y: 67}
-  - {x: 57, y: 2}
-  - {x: 64, y: 93}
-  tiles:
-  - {fileID: 11400000, guid: 5c7edb569040af94e99c4c3e119f1367, type: 2}
-  - {fileID: 11400000, guid: a553ebaada31f6048a480e71537d6ea8, type: 2}
-  - {fileID: 11400000, guid: 15b6972f7cfb521429db087609cb86b0, type: 2}
-  - {fileID: 11400000, guid: 91dad2b8d5696a2439d7a1ff685022bc, type: 2}
+  mapSize: {x: 12, y: 12}
+  mapOrigin: {x: 0, y: 0}
+  boardTile: {fileID: 11400000, guid: 5c7edb569040af94e99c4c3e119f1367, type: 2}
+  playerPrefab: {fileID: 2124672400035371660, guid: b00b3018b09ba014a8a9c9d5478c7c72, type: 3}
+  playerSpawnCell: {x: 3, y: 5}
+  playerOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &305703457
 Transform:
   m_ObjectHideFlags: 0
@@ -344,9 +335,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ComponentVersion: 2
+  m_ComponentVersion: 4
   m_LightType: 4
   m_BlendStyleIndex: 0
+  m_Light2DProvider:
+    rid: -2
+  m_SelectionSources:
+    rid: 7062803671171989504
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
@@ -384,6 +379,23 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 7062803671171989504
+      type: {class: Light2DProviderSources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
+      data:
+        m_SelectedHashCode: 4
+        m_SelectedSource:
+          rid: -2
+        m_Provider2DCache:
+          rid: 7062803671171989593
+    - rid: 7062803671171989593
+      type: {class: 'Provider2DCache`1[[UnityEngine.Rendering.Universal.Light2DProvider, Unity.RenderPipelines.Universal.2D.Runtime]]', ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
+      data:
+        m_Cache: []
 --- !u!4 &619394802
 Transform:
   m_ObjectHideFlags: 0

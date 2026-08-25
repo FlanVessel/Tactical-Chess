@@ -1,84 +1,94 @@
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class TilemapControlller : MonoBehaviour
 {
     [Header("Configuracion de Mapa")]
-    [SerializeField]public List<Vector2Int> mapSize;
-    [SerializeField]public List<Vector2Int> mapOrigin;
-    [SerializeField]public List<Tile> tiles;
+    [SerializeField]private Vector2Int mapSize = new Vector2Int(12, 12);
+    [SerializeField]private Vector2Int mapOrigin = Vector2Int.zero;
+    [SerializeField]private TileBase boardTile;
+
+    [Header("Configuracion del Jugador")]
+    [SerializeField]private GameObject playerPrefab;
+    [SerializeField]private Vector2Int playerSpawnCell = new Vector2Int(3, 5);
+    [SerializeField]private Vector3 playerOffset = new Vector3(0f, 0.25f, 0f);
+
+    private Tilemap _boardTilemap;
+
 
     private void Start()
     {
-        // Creamos objeto vacio
-        GameObject grid = new GameObject();
-        grid.name = "Grid"; //lo llamamos Grid
-
-        // Le agregamos un objeto de la clase Grid
-        grid.AddComponent<Grid>();
-
-        //Obtenemod el componente de grid
-        Grid isometricGrid = grid.GetComponent<Grid>();
-
-        //llamamos el parametro de cellLayout y cellSize
-        isometricGrid.cellLayout = GridLayout.CellLayout.Isometric;
-        isometricGrid.cellSize = new Vector3(1, 0.5f, 1);
-
-        // Creamos el hijo
-        GameObject tilemap = new GameObject();
-        tilemap.name = "Tilemap"; //lo llamamos al hijo Tilemap
-
-        // Le agregamos sus objetos al gameobject tilemap y tilemapRenderer
-        tilemap.AddComponent<Tilemap>();
-        tilemap.AddComponent<TilemapRenderer>();
-
-        // Le agregamos las propiedades al tilemapRenderer para modificar el orden de dibujo en SortOrder a TopRight
-        TilemapRenderer tilemapRenderer = tilemap.GetComponent<TilemapRenderer>();                      // Accedemos al componente TilemapRenderer
-        tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;                                 // Modificamos la propiedad sortOrder
-
-        // Asignarle a tilemap el padre que es grid
-        tilemap.transform.parent = grid.transform;
-
-        Tilemap map = tilemap.GetComponent<Tilemap>();
-
-        GenerateLine(map);
-        GenerateRectangle(map);
-        GenerateCircle(map);
-        GenerateTriangle(map);
-
+        CreateIsometricGrid();
+        GenerateBoard();
+        SpawnPlayer(playerSpawnCell);
     }
 
-    private void GenerateRectangle(Tilemap tilemap)
+    private void CreateIsometricGrid()
     {
-        Map map = new Map(mapOrigin[1], mapSize[1], tilemap, MapType.Rectangle);
-        List<Vector3Int> coordinates = map.generateCoordinates();
+        //Creamos el Grid
+        GameObject gridObject = new GameObject("Grid");
+        //Le agregamos el componente Grid
+        Grid grid = gridObject.AddComponent<Grid>();
 
-        map.Render(coordinates, tiles[1], tilemap);
+        //Configuramos el Grid como Isometrico
+        grid.cellLayout = GridLayout.CellLayout.Isometric;
+
+        grid.cellSize = new Vector3(1f, 0.5f, 1f);
+
+        //Creamos el objeto Tilemap
+        GameObject tilemapObject = new GameObject("BoardTilemap");
+
+        tilemapObject.transform.SetParent(gridObject.transform);
+
+        //Agregamos los componentes
+        _boardTilemap = tilemapObject.AddComponent<Tilemap>();
+
+        TilemapRenderer tilemapRenderer = tilemapObject.AddComponent<TilemapRenderer>();
+        tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
     }
 
-    private void GenerateTriangle(Tilemap tilemap)
+    private void GenerateBoard()
     {
-        Map map = new Map(mapOrigin[3], mapSize[3], tilemap, MapType.Triangle);
-        List<Vector3Int> coordinates = map.generateCoordinates();
+        if (boardTile == null)
+        {
+            Debug.LogError("No se asigno al tile del tablero.");
+            return;
+        }
 
-        map.Render(coordinates, tiles[3], tilemap);
+        Map map = new Map(mapOrigin, mapSize);
+
+        List<Vector3Int> coordinates = map.GenerateCoordinates();
+
+        foreach (Vector3Int coordinate in coordinates)
+        {
+            _boardTilemap.SetTile(coordinate, boardTile);
+        }
     }
 
-    private void GenerateLine(Tilemap tilemap)
+    private void SpawnPlayer(Vector2Int cell)
     {
-        Map map = new Map(mapOrigin[0], mapSize[0], tilemap, MapType.Line);
-        List<Vector3Int> coordinates = map.generateCoordinates();
+        if (playerPrefab == null)
+        {
+            Debug.LogError("No se asigno el prefap del jugador.");
+            return;
+        }
 
-        map.Render(coordinates, tiles[0], tilemap);
+        Vector3Int cellPosition = new Vector3Int(cell.x, cell.y, 0);
+
+        //Revisamos que exista una casilla
+        if (!_boardTilemap.HasTile(cellPosition))
+        {
+            Debug.LogError($"No existe una casilla en {cellPosition}.");
+            return;
+        }
+
+        //Convertimos la casilla en una posicion de la escena
+        Vector3 worldPosition = _boardTilemap.GetCellCenterWorld(cellPosition);
+
+        GameObject player = Instantiate(playerPrefab, worldPosition + playerOffset,Quaternion.identity);
+
+        player.name = $"Player_Cell_{cell.x}_{cell.y}";
     }
 
-    private void GenerateCircle(Tilemap tilemap)
-    {
-        Map map = new Map(mapOrigin[2], mapSize[2], tilemap, MapType.Circle);
-        List<Vector3Int> coordinates = map.generateCoordinates();
-
-        map.Render(coordinates, tiles[2], tilemap);
-    }
 }
