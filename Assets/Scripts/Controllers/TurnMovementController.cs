@@ -86,7 +86,7 @@ public class TurnMovementController : MonoBehaviour
 
     private void ShowReachableCells()
     {
-        //limpiamos la selecciones anteriores y seleccionamos al personaje
+        //Limpiamos la selecciones anteriores y seleccionamos al personaje
         ClearSelection();
 
         _selected = true;

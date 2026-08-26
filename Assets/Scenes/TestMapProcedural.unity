@@ -155,7 +155,7 @@ MonoBehaviour:
   playerSpawnCell: {x: 3, y: 5}
   playerOffset: {x: 0, y: 0, z: 0}
   reachableTile: {fileID: 11400000, guid: 15b6972f7cfb521429db087609cb86b0, type: 2}
-  playerMovementPoints: 6
+  playerMovementPoints: 2
   playerMovementSpeed: 3
 --- !u!4 &305703457
 Transform:

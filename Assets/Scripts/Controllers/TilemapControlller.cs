@@ -54,6 +54,7 @@ public class TilemapControlller : MonoBehaviour
         TilemapRenderer tilemapRenderer = tilemapObject.AddComponent<TilemapRenderer>();
         tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
 
+        //Creamos el HighLightTilemap para ver las areas visibles donde se puede mover
         _hightlighTilemap = CreateHighlightTilemap(gridObject);
     }
 
@@ -112,12 +113,15 @@ public class TilemapControlller : MonoBehaviour
 
     private Tilemap CreateHighlightTilemap(GameObject gridObject)
     {
+        //Creamos MovementHiglights y lo hacemos hijo
         GameObject highLightObject = new GameObject("MovementHighlights");
         highLightObject.transform.SetParent(gridObject.transform);
 
+        //Le agregamos los componentes de Tilemap y TilemapRenderer
         Tilemap tilemap = highLightObject.AddComponent<Tilemap>();
         TilemapRenderer renderer = highLightObject.AddComponent<TilemapRenderer>();
 
+        //Lo renderiza
         renderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
         renderer.sortingOrder = 10;
 
