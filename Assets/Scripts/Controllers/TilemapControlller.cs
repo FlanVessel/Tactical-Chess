@@ -14,6 +14,13 @@ public class TilemapControlller : MonoBehaviour
     [SerializeField]private Vector2Int playerSpawnCell = new Vector2Int(3, 5);
     [SerializeField]private Vector3 playerOffset = new Vector3(0f, 0.25f, 0f);
 
+    [Header("Configuracion de Movimiento")]
+    [SerializeField]private TileBase reachableTile;
+    [SerializeField, Min(0)]private int playerMovementPoints = 6;
+    [SerializeField, Min(0.1f)]private float playerMovementSpeed = 3f;
+
+    private Tilemap _hightlighTilemap;
+
     private Tilemap _boardTilemap;
 
 
@@ -46,6 +53,8 @@ public class TilemapControlller : MonoBehaviour
 
         TilemapRenderer tilemapRenderer = tilemapObject.AddComponent<TilemapRenderer>();
         tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
+
+        _hightlighTilemap = CreateHighlightTilemap(gridObject);
     }
 
     private void GenerateBoard()
@@ -89,6 +98,30 @@ public class TilemapControlller : MonoBehaviour
         GameObject player = Instantiate(playerPrefab, worldPosition + playerOffset,Quaternion.identity);
 
         player.name = $"Player_Cell_{cell.x}_{cell.y}";
+
+        TurnMovementController movementController = player.GetComponent<TurnMovementController>();
+
+        if (movementController == null)
+        {
+            Debug.LogError("El prefap no tiene TurnMovementController.");
+            return;
+        }
+
+        movementController.Setup(_boardTilemap, _hightlighTilemap, reachableTile, cellPosition, playerOffset, playerMovementPoints, playerMovementSpeed);
+    }
+
+    private Tilemap CreateHighlightTilemap(GameObject gridObject)
+    {
+        GameObject highLightObject = new GameObject("MovementHighlights");
+        highLightObject.transform.SetParent(gridObject.transform);
+
+        Tilemap tilemap = highLightObject.AddComponent<Tilemap>();
+        TilemapRenderer renderer = highLightObject.AddComponent<TilemapRenderer>();
+
+        renderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
+        renderer.sortingOrder = 10;
+
+        return tilemap;
     }
 
 }
