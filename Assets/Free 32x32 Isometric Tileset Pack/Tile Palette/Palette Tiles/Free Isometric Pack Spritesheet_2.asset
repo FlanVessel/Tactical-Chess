@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Free Isometric Pack Spritesheet_2
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: -330113347, guid: b9322abd4f2aaad4c979c052daa67961, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.3254902}
   m_Transform:
     e00: 1
     e01: 0

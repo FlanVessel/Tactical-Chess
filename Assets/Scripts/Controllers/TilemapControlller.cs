@@ -28,6 +28,7 @@ public class TilemapControlller : MonoBehaviour
     {
         CreateIsometricGrid();
         GenerateBoard();
+        SetupCamera();
         SpawnPlayer(playerSpawnCell);
     }
 
@@ -126,6 +127,32 @@ public class TilemapControlller : MonoBehaviour
         renderer.sortingOrder = 10;
 
         return tilemap;
+    }
+
+    private void SetupCamera()
+    {
+        //Buscamos a la CamaraMain
+        Camera mainCamera = Camera.main;
+
+        //Si no existe o es nula, resalta comentario
+        if (mainCamera == null)
+        {
+            Debug.LogError("No existe una cámara con el tag MainCamera.");
+            return;
+        }
+
+        //Buscamos el Script CameraController en la Camara
+        CameraController cameraController = mainCamera.GetComponent<CameraController>();
+
+        //Si no existe o es nula, reslta comentario
+        if (cameraController == null)
+        {
+            Debug.LogError("Main Camera no tiene CameraController.");
+            return;
+        }
+
+        //Llamamos al metodo Setup con el valor de Tilemap
+        cameraController.Setup(_boardTilemap);
     }
 
 }
