@@ -84,6 +84,14 @@ public class TurnMovementController : MonoBehaviour
         if (_selected && reachableCells.Contains(clickedCell)) StartCoroutine(MoveTo(clickedCell));
     }
 
+    private void Scroll()
+    {
+        Camera gameCamera = Camera.main;
+
+        if (gameCamera == null) return;
+
+    }
+
     private void ShowReachableCells()
     {
         //Limpiamos la selecciones anteriores y seleccionamos al personaje
