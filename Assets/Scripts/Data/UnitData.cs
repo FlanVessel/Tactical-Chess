@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "NewUnitData", menuName = "Units/Unit Data")]
+
 public class UnitData : ScriptableObject
 {
     [Header("Identidad")]
@@ -12,12 +14,16 @@ public class UnitData : ScriptableObject
     [SerializeField, Min(0)] private int movePoints = 3;
 
     [Header("Acciones")]
-    [SerializeField] private List<UnitActionData> availableActions;
+    [SerializeField] private List<UnitActionData> availableActions = new List<UnitActionData>();
+
+    [Header("Emocion")]
+    [SerializeField, Range(0, 100)] private int startingDesperation = 50;
 
     public string UnitName => unitName;
     public Sprite UnitSprite => unitSprite;
     public int MaxHealth => maxHealth;
-    public int MovePoitns => movePoints;
+    public int MovePoints => movePoints;
+    public int StartingDesperation => startingDesperation;
 
     public IReadOnlyList<UnitActionData> AvailableActions => availableActions;
 }

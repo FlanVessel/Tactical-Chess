@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
-using Unity.VisualScripting;
 
 public class TurnMovementController : MonoBehaviour
 {
@@ -82,14 +81,6 @@ public class TurnMovementController : MonoBehaviour
         }
 
         if (_selected && reachableCells.Contains(clickedCell)) StartCoroutine(MoveTo(clickedCell));
-    }
-
-    private void Scroll()
-    {
-        Camera gameCamera = Camera.main;
-
-        if (gameCamera == null) return;
-
     }
 
     private void ShowReachableCells()

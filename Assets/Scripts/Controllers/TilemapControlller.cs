@@ -19,7 +19,7 @@ public class TilemapControlller : MonoBehaviour
     [SerializeField, Min(0)]private int playerMovementPoints = 6;
     [SerializeField, Min(0.1f)]private float playerMovementSpeed = 3f;
 
-    private Tilemap _hightlighTilemap;
+    private Tilemap _highlighTilemap;
 
     private Tilemap _boardTilemap;
 
@@ -56,7 +56,7 @@ public class TilemapControlller : MonoBehaviour
         tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
 
         //Creamos el HighLightTilemap para ver las areas visibles donde se puede mover
-        _hightlighTilemap = CreateHighlightTilemap(gridObject);
+        _highlighTilemap = CreateHighlightTilemap(gridObject);
     }
 
     private void GenerateBoard()
@@ -109,7 +109,7 @@ public class TilemapControlller : MonoBehaviour
             return;
         }
 
-        movementController.Setup(_boardTilemap, _hightlighTilemap, reachableTile, cellPosition, playerOffset, playerMovementPoints, playerMovementSpeed);
+        movementController.Setup(_boardTilemap, _highlighTilemap, reachableTile, cellPosition, playerOffset, playerMovementPoints, playerMovementSpeed);
     }
 
     private Tilemap CreateHighlightTilemap(GameObject gridObject)
