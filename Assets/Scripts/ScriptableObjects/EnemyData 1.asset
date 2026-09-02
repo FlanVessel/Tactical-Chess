@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 933ee6d35b48c3247a26b674361c6901, type: 3}
+  m_Name: EnemyData 1
+  m_EditorClassIdentifier: Assembly-CSharp::UnitData
+  unitName: Enemy2
+  unitSprite: {fileID: 6177166511900065722, guid: 56e91428f99b7d34aa6c433e5917246c, type: 3}
+  maxHealth: 5
+  movePoints: 5
+  availableActions: []
+  startingDesperation: 50

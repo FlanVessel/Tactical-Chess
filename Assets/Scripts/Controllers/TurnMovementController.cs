@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.InputSystem;
 
 public class TurnMovementController : MonoBehaviour
 {
@@ -12,14 +11,15 @@ public class TurnMovementController : MonoBehaviour
     private TileBase _reachableTile;
     private Vector3Int _currentCell;
     private Vector3 _playerOffset;
-    private int _movementPoints;
     private float _movementSpeed;
     private bool _selected;
     private bool _moving;
     private readonly HashSet<Vector3Int> reachableCells = new();
     private readonly Dictionary<Vector3Int, Vector3Int> cameFrom = new();
+    private Unit _unit;
+    private BoardOccupancy _boardOccupancy;
 
-    public void Setup(Tilemap board, Tilemap highlights, TileBase tile, Vector3Int initialCell, Vector3 offSet, int steps, float speed)
+    public void Setup(Tilemap board, Tilemap highlights, TileBase tile, Vector3Int initialCell, Vector3 offSet, float speed, BoardOccupancy boardOccupancy)
     {
         //Reciben informacion
         _boardTilemap = board;
@@ -29,64 +29,32 @@ public class TurnMovementController : MonoBehaviour
         _currentCell = initialCell;
         _playerOffset = offSet;
 
-        _movementPoints = steps;
-        _movementSpeed = speed;
+        _boardOccupancy = boardOccupancy;
 
-        //Checamos que los pasos no sean negativos y que su velocidad no sea cero o negativo
-        _movementPoints = Mathf.Max(0, steps);
+        _unit = GetComponent<Unit>();
+
+        if (_unit == null)
+        {
+            Debug.LogError($"{name} no contiene un componente Unit.");
+            return;
+        }
+
+        //Checamos que su velocidad no sea cero o negativo
         _movementSpeed = Mathf.Max(0.1f, speed);
 
         //Colocacion exacta del personaje
         transform.position = _boardTilemap.GetCellCenterWorld(_currentCell) + _playerOffset;
     }
 
-    private void Update()
-    {
-        //Checamos si se esta moviendo
-        if (_moving) return;
-
-        //Comprobamos si existe el mouse
-        if (Mouse.current == null) return;
-
-        //Detectamos el click izquierdo
-        if (Mouse.current.leftButton.wasPressedThisFrame) HandleClick();
-    }
-
-    private void HandleClick()
-    {
-        Camera gameCamera = Camera.main;
-
-        if (gameCamera == null) return;
-
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
-
-        Vector3 screenPosition = new Vector3(mousePosition.x, mousePosition.y, Mathf.Abs(gameCamera.transform.position.z));
-
-        Vector3 worldPosition = gameCamera.ScreenToWorldPoint(screenPosition);
-
-        Vector3Int clickedCell = _boardTilemap.WorldToCell(worldPosition);
-
-        if (clickedCell == _currentCell)
-        {
-            if (_selected)
-            {
-                ClearSelection();
-            }
-            else
-            {
-                ShowReachableCells();
-            }
-
-            return;
-        }
-
-        if (_selected && reachableCells.Contains(clickedCell)) StartCoroutine(MoveTo(clickedCell));
-    }
-
-    private void ShowReachableCells()
+    public void ShowReachableCells()
     {
         //Limpiamos la selecciones anteriores y seleccionamos al personaje
         ClearSelection();
+
+        if (_unit == null) return;
+        if (!_unit.IsActive) return;
+        if (_unit.IsMoving) return;
+        if (_unit.RemainingMovement <= 0) return;
 
         _selected = true;
 
@@ -110,7 +78,7 @@ public class TurnMovementController : MonoBehaviour
                 Vector3Int next = current + direction;
                 int nextDistance = currentDistance + 1;
 
-                if (nextDistance > _movementPoints) continue;
+                if (nextDistance > _unit.RemainingMovement) continue;
 
                 if (!_boardTilemap.HasTile(next)) continue;
 
@@ -131,33 +99,61 @@ public class TurnMovementController : MonoBehaviour
 
     private bool IsBlocked(Vector3Int cell)
     {
-        return false;
+        if (_boardOccupancy == null) return false;
+        return _boardOccupancy.IsOccupied(cell);
     }
 
-    private IEnumerator MoveTo(Vector3Int destination)
+    private IEnumerator MoveTo(List<Vector3Int> path, int movementCost)
     {
+        if (!_unit.SpendMovement(movementCost))
+        {
+            _moving = false;
+            _unit.SetMoving(false);
+            yield break;
+        }
+
         _moving = true;
         _selected = false;
+        _unit.SetMoving(true);
 
-        List<Vector3Int> path = BuildPath(destination);
         _highlightTilemap.ClearAllTiles();
         reachableCells.Clear();
+        cameFrom.Clear();
 
         for (int i = 1; i < path.Count; i++)
         {
-            Vector3 targetPosition = _boardTilemap.GetCellCenterWorld(path[i]) + _playerOffset;
+            Vector3Int nextCell = path[i];
 
-            while (Vector3.Distance(transform.position, targetPosition) > 0.01f)
+            bool couldMove = _boardOccupancy.TryMoveUnit(_unit, _currentCell, nextCell);
+
+            if (!couldMove)
             {
+                Debug.LogWarning($"{name} no pudo avanzar hacia {nextCell}.");
+
+                break;
+            }
+
+            Vector3 targetPosition = _boardTilemap.GetCellCenterWorld(nextCell) + _playerOffset;
+
+            while (Vector3.Distance(transform.position,targetPosition) > 0.01f)
+            {
+
                 transform.position = Vector3.MoveTowards(transform.position, targetPosition, _movementSpeed * Time.deltaTime);
                 yield return null;
+
             }
 
             transform.position = targetPosition;
-            _currentCell = path[i];
+            _currentCell = nextCell;
+
+            if (_unit != null)
+            {
+                _unit.SetCurrentCell(_currentCell);
+            }
         }
 
         _moving = false;
+        _unit.SetMoving(false);
     }
 
     private List<Vector3Int>BuildPath(Vector3Int destination)
@@ -177,12 +173,29 @@ public class TurnMovementController : MonoBehaviour
         return path;
     }
 
-    private void ClearSelection()
+    public void ClearSelection()
     {
         _selected = false;
         reachableCells.Clear();
         cameFrom.Clear();
 
         if (_highlightTilemap != null) _highlightTilemap.ClearAllTiles();
+    }
+
+    public bool TryMoveTo(Vector3Int destination)
+    {
+        if (_moving) return false;
+        if (!_selected) return false;
+        if (_unit == null) return false;
+        if (!reachableCells.Contains(destination)) return false;
+
+        List<Vector3Int> path = BuildPath(destination);
+
+        int movementCost = path.Count - 1;
+
+        if (!_unit.CanSpendMovement(movementCost)) return false;
+
+        StartCoroutine(MoveTo(path, movementCost));
+        return true;
     }
 }

@@ -288,11 +288,22 @@ MonoBehaviour:
   mapSize: {x: 10, y: 10}
   mapOrigin: {x: 0, y: 0}
   boardTile: {fileID: 11400000, guid: 5c7edb569040af94e99c4c3e119f1367, type: 2}
-  playerPrefab: {fileID: 2124672400035371660, guid: b00b3018b09ba014a8a9c9d5478c7c72, type: 3}
-  playerSpawnCell: {x: 3, y: 5}
-  playerOffset: {x: 0, y: 0, z: 0}
+  playerSpawns:
+  - prefab: {fileID: 7046367023855403799, guid: 0fb6ae245223477408836da04ee03f89, type: 3}
+    spawnCell: {x: 2, y: 3}
+  - prefab: {fileID: 7046367023855403799, guid: ef34cf4ca24478043a01d8db46e8f7c9, type: 3}
+    spawnCell: {x: 3, y: 3}
+  - prefab: {fileID: 7046367023855403799, guid: 285315d7f88c56741a6244a4b13c9739, type: 3}
+    spawnCell: {x: 4, y: 3}
+  - prefab: {fileID: 7046367023855403799, guid: 42356cdeefba21240af9036dc00dd5f7, type: 3}
+    spawnCell: {x: 5, y: 3}
+  enemySpawns:
+  - prefab: {fileID: 7874699089756622026, guid: 8ee6f2eb6a1e17440bd68b5e92253323, type: 3}
+    spawnCell: {x: 8, y: 8}
+  - prefab: {fileID: 7874699089756622026, guid: 59e338973af51c24594e4adfd43917fa, type: 3}
+    spawnCell: {x: 9, y: 8}
+  unitOffset: {x: 0, y: 0, z: 0}
   reachableTile: {fileID: 11400000, guid: 15b6972f7cfb521429db087609cb86b0, type: 2}
-  playerMovementPoints: 2
   playerMovementSpeed: 3
 --- !u!4 &305703457
 Transform:

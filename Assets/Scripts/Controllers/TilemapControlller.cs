@@ -9,27 +9,36 @@ public class TilemapControlller : MonoBehaviour
     [SerializeField]private Vector2Int mapOrigin = Vector2Int.zero;
     [SerializeField]private TileBase boardTile;
 
-    [Header("Configuracion del Jugador")]
-    [SerializeField]private GameObject playerPrefab;
-    [SerializeField]private Vector2Int playerSpawnCell = new Vector2Int(3, 5);
-    [SerializeField]private Vector3 playerOffset = new Vector3(0f, 0.25f, 0f);
+    [Header("Configuracion de unidades")]
+    [SerializeField] private List<UnitSpawnConfig> playerSpawns = new List<UnitSpawnConfig>();
+    [SerializeField] private List<UnitSpawnConfig> enemySpawns = new List<UnitSpawnConfig>();
+    [SerializeField] private Vector3 unitOffset = Vector3.zero;
 
     [Header("Configuracion de Movimiento")]
     [SerializeField]private TileBase reachableTile;
-    [SerializeField, Min(0)]private int playerMovementPoints = 6;
+    //[SerializeField, Min(0)]private int playerMovementPoints = 6;
     [SerializeField, Min(0.1f)]private float playerMovementSpeed = 3f;
 
-    private Tilemap _highlighTilemap;
 
+
+    private Tilemap _highlighTilemap;
     private Tilemap _boardTilemap;
+
+    private PlayerTacticalController _playerTacticalController;
+    private BoardOccupancy _boardOccupancy;
 
 
     private void Start()
     {
         CreateIsometricGrid();
         GenerateBoard();
+
         SetupCamera();
-        SpawnPlayer(playerSpawnCell);
+        SetUpBoardOccupancy();
+        SetupPlayerTacticalController();
+
+        SpawnUnits(playerSpawns, true);
+        SpawnUnits(enemySpawns, false);
     }
 
     private void CreateIsometricGrid()
@@ -77,15 +86,31 @@ public class TilemapControlller : MonoBehaviour
         }
     }
 
-    private void SpawnPlayer(Vector2Int cell)
+    private void SpawnUnits(List<UnitSpawnConfig> spawnConfigs, bool beginActive)
     {
-        if (playerPrefab == null)
+        foreach (UnitSpawnConfig config in spawnConfigs)
         {
-            Debug.LogError("No se asigno el prefap del jugador.");
+            SpawnUnit(config, beginActive);
+        }
+    }
+
+    private void SpawnUnit(UnitSpawnConfig config, bool beginActive)
+    {
+        if (config == null)
+        {
+            Debug.LogError("Existe una configuracion de aparicion vacia.");
             return;
         }
 
-        Vector3Int cellPosition = new Vector3Int(cell.x, cell.y, 0);
+        if (config.Prefap == null)
+        {
+            Debug.LogError("Unidad no tiene prefab asignado.");
+            return;
+        }
+
+        Vector2Int configCell = config.SpawnCell;
+
+        Vector3Int cellPosition = new Vector3Int(configCell.x, configCell.y, 0);
 
         //Revisamos que exista una casilla
         if (!_boardTilemap.HasTile(cellPosition))
@@ -97,19 +122,62 @@ public class TilemapControlller : MonoBehaviour
         //Convertimos la casilla en una posicion de la escena
         Vector3 worldPosition = _boardTilemap.GetCellCenterWorld(cellPosition);
 
-        GameObject player = Instantiate(playerPrefab, worldPosition + playerOffset,Quaternion.identity);
-
-        player.name = $"Player_Cell_{cell.x}_{cell.y}";
-
-        TurnMovementController movementController = player.GetComponent<TurnMovementController>();
-
-        if (movementController == null)
+        /*if (_boardOccupancy.IsOccupied(cellPosition))
         {
-            Debug.LogError("El prefap no tiene TurnMovementController.");
+            Debug.LogError($"No se puede generar una unidad: la casilla {cellPosition} esta ocupada");
+            continue;
+        }*/
+
+        GameObject unitObject = Instantiate(config.Prefap, worldPosition + unitOffset, Quaternion.identity);
+
+        Unit unit = unitObject.GetComponent<Unit>();
+
+        if (unit == null)
+        {
+            Destroy(unitObject);
             return;
         }
 
-        movementController.Setup(_boardTilemap, _highlighTilemap, reachableTile, cellPosition, playerOffset, playerMovementPoints, playerMovementSpeed);
+        unitObject.name = $"{config.Prefap.name}_Cell_" + $"{configCell.x}_{configCell.y}";
+
+        unit.Initialize(cellPosition);
+
+        if (!_boardOccupancy.RegisterUnit(unit, cellPosition))
+        {
+            Debug.LogError($"No se pudo registrar {unit.name} en {cellPosition}.");
+            Destroy(unitObject);
+            return;
+        }
+
+        if (beginActive) unit.BeginTurn();
+
+        if (unit is PlayerUnit playerUnit)
+        {
+            ConfigureMovement(unitObject, unit, cellPosition);
+            _playerTacticalController.RegisterUnit(playerUnit);
+        }
+    }
+
+    private void SetupPlayerTacticalController()
+    {
+        _playerTacticalController = GetComponent<PlayerTacticalController>();
+
+        if (_playerTacticalController == null) _playerTacticalController = gameObject.AddComponent<PlayerTacticalController>();
+
+        _playerTacticalController.Setup(_boardTilemap, Camera.main);
+    }
+
+    private void ConfigureMovement(GameObject unitObject, Unit unit, Vector3Int cellPosition)
+    {
+        TurnMovementController movementController = unitObject.GetComponent<TurnMovementController>();
+
+        if (movementController == null)
+        {
+            Debug.LogError($"{unitObject.name} no tiene " + "TurnMovementController.");
+            return;
+        }
+
+        movementController.Setup(_boardTilemap, _highlighTilemap, reachableTile, cellPosition, unitOffset, playerMovementSpeed, _boardOccupancy);
     }
 
     private Tilemap CreateHighlightTilemap(GameObject gridObject)
@@ -153,6 +221,13 @@ public class TilemapControlller : MonoBehaviour
 
         //Llamamos al metodo Setup con el valor de Tilemap
         cameraController.Setup(_boardTilemap);
+    }
+
+    private void SetUpBoardOccupancy()
+    {
+        _boardOccupancy = GetComponent<BoardOccupancy>();
+
+        if (_boardOccupancy == null) _boardOccupancy = gameObject.AddComponent<BoardOccupancy>();
     }
 
 }
