@@ -193,6 +193,7 @@ public class PlayerTacticalController : MonoBehaviour
         if (!_attackCells.Contains(clickedCell))
         {
             Debug.Log("La casilla no es parte del rango de ataque.");
+            CancelAttackMode();
             return;
         }
 
@@ -201,18 +202,21 @@ public class PlayerTacticalController : MonoBehaviour
         if (target == null)
         {
             Debug.Log("No hay ninguna unidad en esta casilla.");
+            CancelAttackMode();
             return;
         }
 
         if (target is not EnemyUnit)
         {
             Debug.Log("El Ataque basico ataca enemigos.");
+            CancelAttackMode();
             return;
         }
 
         if (!_selectedUnit.UseAction())
         {
             Debug.Log("El peon ya utilizo su accion.");
+            CancelAttackMode();
             return;
         }
 
