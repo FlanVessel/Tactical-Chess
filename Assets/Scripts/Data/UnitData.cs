@@ -11,7 +11,10 @@ public class UnitData : ScriptableObject
 
     [Header("Estadisticas")]
     [SerializeField, Min(1)] private int maxHealth = 10;
-    [SerializeField, Min(0)] private int movePoints = 3;
+
+    [Header("Movimiento")]
+    [SerializeField, Min(0)] private int moveRange = 3;
+    [SerializeField, Min(0.1f)] private float movementSpeed = 3f;
 
     [Header("Acciones")]
     [SerializeField] private List<UnitActionData> availableActions = new List<UnitActionData>();
@@ -22,7 +25,8 @@ public class UnitData : ScriptableObject
     public string UnitName => unitName;
     public Sprite UnitSprite => unitSprite;
     public int MaxHealth => maxHealth;
-    public int MovePoints => movePoints;
+    public int MoveRange => moveRange;
+    public float MovementSpeed => movementSpeed;
     public int StartingDesperation => startingDesperation;
 
     public IReadOnlyList<UnitActionData> AvailableActions => availableActions;

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5088690633288180081}
   - component: {fileID: 2987738348631073418}
   - component: {fileID: 8364201206437388084}
+  - component: {fileID: 3319244224728610919}
   m_Layer: 0
   m_Name: EnemyPawn 1
   m_TagString: Untagged
@@ -106,3 +107,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyUnit
   unitData: {fileID: 11400000, guid: 1d887a9ab5b90a2469aa8f56f25d734d, type: 2}
+--- !u!114 &3319244224728610919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874699089756622026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b56fdda503def06438d93b1b0b859da3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovementController

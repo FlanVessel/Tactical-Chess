@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -16,15 +17,16 @@ public class TilemapControlller : MonoBehaviour
 
     [Header("Configuracion de Movimiento")]
     [SerializeField]private TileBase reachableTile;
-    //[SerializeField, Min(0)]private int playerMovementPoints = 6;
-    [SerializeField, Min(0.1f)]private float playerMovementSpeed = 3f;
 
-
+    [Header("Configuracion de Ataque")]
+    [SerializeField] private TileBase attackTile;
+    [SerializeField] private UnitActionData basicAttack;
 
     private Tilemap _highlighTilemap;
     private Tilemap _boardTilemap;
 
     private PlayerTacticalController _playerTacticalController;
+    private TurnManager _turnManager;
     private BoardOccupancy _boardOccupancy;
 
 
@@ -36,9 +38,12 @@ public class TilemapControlller : MonoBehaviour
         SetupCamera();
         SetUpBoardOccupancy();
         SetupPlayerTacticalController();
+        SetupTurnManager();
 
-        SpawnUnits(playerSpawns, true);
-        SpawnUnits(enemySpawns, false);
+        SpawnUnits(playerSpawns);
+        SpawnUnits(enemySpawns);
+
+        _turnManager.StartBattle();
     }
 
     private void CreateIsometricGrid()
@@ -86,15 +91,15 @@ public class TilemapControlller : MonoBehaviour
         }
     }
 
-    private void SpawnUnits(List<UnitSpawnConfig> spawnConfigs, bool beginActive)
+    private void SpawnUnits(List<UnitSpawnConfig> spawnConfigs)
     {
         foreach (UnitSpawnConfig config in spawnConfigs)
         {
-            SpawnUnit(config, beginActive);
+            SpawnUnit(config);
         }
     }
 
-    private void SpawnUnit(UnitSpawnConfig config, bool beginActive)
+    private void SpawnUnit(UnitSpawnConfig config)
     {
         if (config == null)
         {
@@ -122,12 +127,6 @@ public class TilemapControlller : MonoBehaviour
         //Convertimos la casilla en una posicion de la escena
         Vector3 worldPosition = _boardTilemap.GetCellCenterWorld(cellPosition);
 
-        /*if (_boardOccupancy.IsOccupied(cellPosition))
-        {
-            Debug.LogError($"No se puede generar una unidad: la casilla {cellPosition} esta ocupada");
-            continue;
-        }*/
-
         GameObject unitObject = Instantiate(config.Prefap, worldPosition + unitOffset, Quaternion.identity);
 
         Unit unit = unitObject.GetComponent<Unit>();
@@ -149,12 +148,16 @@ public class TilemapControlller : MonoBehaviour
             return;
         }
 
-        if (beginActive) unit.BeginTurn();
+        _turnManager.RegisterUnit(unit);
 
         if (unit is PlayerUnit playerUnit)
         {
             ConfigureMovement(unitObject, unit, cellPosition);
             _playerTacticalController.RegisterUnit(playerUnit);
+        }
+        else if (unit is EnemyUnit)
+        {
+            ConfigureEnemyMovement(unitObject);
         }
     }
 
@@ -164,7 +167,7 @@ public class TilemapControlller : MonoBehaviour
 
         if (_playerTacticalController == null) _playerTacticalController = gameObject.AddComponent<PlayerTacticalController>();
 
-        _playerTacticalController.Setup(_boardTilemap, Camera.main);
+        _playerTacticalController.Setup(_boardTilemap, Camera.main, _boardOccupancy, _highlighTilemap, attackTile, basicAttack);
     }
 
     private void ConfigureMovement(GameObject unitObject, Unit unit, Vector3Int cellPosition)
@@ -177,7 +180,20 @@ public class TilemapControlller : MonoBehaviour
             return;
         }
 
-        movementController.Setup(_boardTilemap, _highlighTilemap, reachableTile, cellPosition, unitOffset, playerMovementSpeed, _boardOccupancy);
+        movementController.Setup(_boardTilemap, _highlighTilemap, reachableTile, cellPosition, unitOffset, _boardOccupancy);
+    }
+
+    private void ConfigureEnemyMovement(GameObject unitObject)
+    {
+        EnemyMovementController movementController = unitObject.GetComponent<EnemyMovementController>();
+
+        if (movementController == null)
+        {
+            Debug.Log($"{unitObject.name} no tiene EnemyMovementController.");
+            return;
+        }
+
+        movementController.Setup(_boardTilemap, _boardOccupancy,  unitOffset);
     }
 
     private Tilemap CreateHighlightTilemap(GameObject gridObject)
@@ -228,6 +244,15 @@ public class TilemapControlller : MonoBehaviour
         _boardOccupancy = GetComponent<BoardOccupancy>();
 
         if (_boardOccupancy == null) _boardOccupancy = gameObject.AddComponent<BoardOccupancy>();
+    }
+
+    private void SetupTurnManager()
+    {
+        _turnManager = GetComponent<TurnManager>();
+
+        if (_turnManager == null) _turnManager = gameObject.AddComponent<TurnManager>();
+
+        _turnManager.Setup(_playerTacticalController, _boardOccupancy);
     }
 
 }

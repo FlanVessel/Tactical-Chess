@@ -19,7 +19,7 @@ public class TurnMovementController : MonoBehaviour
     private Unit _unit;
     private BoardOccupancy _boardOccupancy;
 
-    public void Setup(Tilemap board, Tilemap highlights, TileBase tile, Vector3Int initialCell, Vector3 offSet, float speed, BoardOccupancy boardOccupancy)
+    public void Setup(Tilemap board, Tilemap highlights, TileBase tile, Vector3Int initialCell, Vector3 offSet, BoardOccupancy boardOccupancy)
     {
         //Reciben informacion
         _boardTilemap = board;
@@ -40,7 +40,7 @@ public class TurnMovementController : MonoBehaviour
         }
 
         //Checamos que su velocidad no sea cero o negativo
-        _movementSpeed = Mathf.Max(0.1f, speed);
+        _movementSpeed = Mathf.Max(0.1f, _unit.Data.MovementSpeed);
 
         //Colocacion exacta del personaje
         transform.position = _boardTilemap.GetCellCenterWorld(_currentCell) + _playerOffset;
@@ -54,7 +54,7 @@ public class TurnMovementController : MonoBehaviour
         if (_unit == null) return;
         if (!_unit.IsActive) return;
         if (_unit.IsMoving) return;
-        if (_unit.RemainingMovement <= 0) return;
+        if (!_unit.CanMove()) return;
 
         _selected = true;
 
@@ -78,7 +78,7 @@ public class TurnMovementController : MonoBehaviour
                 Vector3Int next = current + direction;
                 int nextDistance = currentDistance + 1;
 
-                if (nextDistance > _unit.RemainingMovement) continue;
+                if (nextDistance > _unit.Data.MoveRange) continue;
 
                 if (!_boardTilemap.HasTile(next)) continue;
 
@@ -103,12 +103,11 @@ public class TurnMovementController : MonoBehaviour
         return _boardOccupancy.IsOccupied(cell);
     }
 
-    private IEnumerator MoveTo(List<Vector3Int> path, int movementCost)
+    private IEnumerator MoveTo(List<Vector3Int> path)
     {
-        if (!_unit.SpendMovement(movementCost))
+        if (!_unit.UseMovement())
         {
-            _moving = false;
-            _unit.SetMoving(false);
+            Debug.Log($"{name} ya utilizo su movimiento.");
             yield break;
         }
 
@@ -154,6 +153,7 @@ public class TurnMovementController : MonoBehaviour
 
         _moving = false;
         _unit.SetMoving(false);
+        Debug.Log($"{name} termino su accion de movimiento.");
     }
 
     private List<Vector3Int>BuildPath(Vector3Int destination)
@@ -191,11 +191,7 @@ public class TurnMovementController : MonoBehaviour
 
         List<Vector3Int> path = BuildPath(destination);
 
-        int movementCost = path.Count - 1;
-
-        if (!_unit.CanSpendMovement(movementCost)) return false;
-
-        StartCoroutine(MoveTo(path, movementCost));
+        StartCoroutine(MoveTo(path));
         return true;
     }
 }

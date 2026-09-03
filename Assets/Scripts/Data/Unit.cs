@@ -1,4 +1,6 @@
 using UnityEngine;
+using System;
+using NUnit.Framework;
 
 public abstract class Unit : MonoBehaviour
 {
@@ -6,16 +8,20 @@ public abstract class Unit : MonoBehaviour
 
     protected Vector3Int currentCell;
     protected int currentHealth;
-    protected int remainingMovement;
+    protected bool hasMoved;
+    protected bool hasActed;
     protected bool isActive;
     protected bool isMoving;
+    public event Action<Unit> Died;
 
     public UnitData Data => unitData;
     public Vector3Int CurrentCell => currentCell;
     public int CurrentHealth => currentHealth;
-    public int RemainingMovement => remainingMovement;
+    public bool HasMoved => hasMoved;
+    public bool HasActed => hasActed;
     public bool IsActive => isActive;
     public bool IsMoving => isMoving;
+    public bool IsDead => currentHealth <= 0;
 
     public virtual void Initialize(Vector3Int initialCell)
     {
@@ -27,8 +33,9 @@ public abstract class Unit : MonoBehaviour
 
         currentCell = initialCell;
         currentHealth = unitData.MaxHealth;
-        remainingMovement = 0;
 
+        hasMoved = false;
+        hasActed = false;
         isActive = false;
         isMoving = false;
     }
@@ -41,31 +48,30 @@ public abstract class Unit : MonoBehaviour
             return;
         }
 
+        if (IsDead) return;
+
         isActive = true;
         isMoving = false;
-
-        remainingMovement = unitData.MovePoints;
+        hasMoved = false;
+        hasActed = false;
     }
 
     public virtual void EndTurn()
     {
         isActive = false;
         isMoving = false;
-        remainingMovement = 0;
     }
 
-    public bool CanSpendMovement(int amount)
+    public bool CanMove()
     {
-        if (amount < 0) return false;
-
-        return isActive && !isMoving && remainingMovement >= amount;
+        return !IsDead && isActive && !isMoving && !hasMoved;
     }
 
-    public bool SpendMovement(int amount)
+    public bool UseMovement()
     {
-        if (!CanSpendMovement(amount)) return false;
+        if (!CanMove()) return false;
 
-        remainingMovement -= amount;
+        hasMoved = true;
         return true;
     }
 
@@ -77,5 +83,62 @@ public abstract class Unit : MonoBehaviour
     public void SetMoving(bool value)
     {
         isMoving = value;
+    }
+
+    public bool CanAct()
+    {
+        return !IsDead && isActive && !isMoving && !hasActed;
+    }
+
+    public bool UseAction()
+    {
+        if (!CanAct()) return false;
+
+        hasActed = true;
+        return true;
+    }
+
+    public void TakeDamage(int amount)
+    {
+        if (IsDead) return;
+
+        if (amount <= 0)
+        {
+            Debug.Log($"Dano recibido: {amount}.");
+            return;
+        }
+
+        currentHealth = Mathf.Max(0, currentHealth - amount);
+
+        Debug.Log($"{name} recibio {amount} de dano. " + $"Vida: {currentHealth}/{unitData.MaxHealth}");
+
+        if (currentHealth == 0) Die();
+    }
+
+    private void Heal(int amount)
+    {
+        if (IsDead) return;
+
+        if (amount <= 0)
+        {
+            Debug.Log($"Has recibido esta cantidad de curacion: {amount}.");
+            return;
+        }
+
+        currentHealth = Mathf.Min(unitData.MaxHealth, currentHealth + amount);
+
+        Debug.Log($"{name} recupero esta cantidad de de vida: {amount}." + $"Vida Actual: {currentHealth}/{unitData.MaxHealth}");
+    }
+
+    protected virtual void Die()
+    {
+        isActive = false;
+        isMoving = false;
+
+        Debug.Log($"{name} ha muerto.");
+
+        Died?.Invoke(this);
+
+        gameObject.SetActive(false);
     }
 }
