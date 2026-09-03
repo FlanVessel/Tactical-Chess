@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 933ee6d35b48c3247a26b674361c6901, type: 3}
-  m_Name: ArcherData
+  m_Name: Normal Pawn
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
-  unitName: Archer
-  unitSprite: {fileID: 2041810561455165220, guid: d32249ebedc52a14093107235368c09e, type: 3}
-  maxHealth: 10
+  unitName: Normal Pawn
+  unitSprite: {fileID: 0}
+  maxHealth: 3
   moveRange: 3
   movementSpeed: 3
   availableActions: []

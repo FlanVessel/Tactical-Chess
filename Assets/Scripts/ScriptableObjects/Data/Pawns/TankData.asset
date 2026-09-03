@@ -15,5 +15,7 @@ MonoBehaviour:
   unitName: Tank
   unitSprite: {fileID: 1450261363465110782, guid: 511deca8e4d40894aa87bb00b9b38c8c, type: 3}
   maxHealth: 25
-  movePoints: 3
+  moveRange: 3
+  movementSpeed: 3
   availableActions: []
+  startingDesperation: 50

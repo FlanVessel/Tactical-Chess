@@ -22,7 +22,7 @@ public class PlayerTacticalController : MonoBehaviour
     private BoardOccupancy _boardOccupancy;
     private Tilemap _highlightTilemap;
     private TileBase _attackTile;
-    private UnitActionData _basicAttack;
+    [SerializeField] private UnitActionData _basicAttack;
 
     private bool _attackMode;
 
@@ -79,8 +79,6 @@ public class PlayerTacticalController : MonoBehaviour
         }
 
         PlayerUnit clickedUnit = FindPlayerAtCell(clickedCell);
-
-        //Debug.Log($"{clickedUnit.name} has seleccionado para moverlo.");
 
         if (clickedUnit != null)
         {

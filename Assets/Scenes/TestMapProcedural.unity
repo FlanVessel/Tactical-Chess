@@ -307,7 +307,6 @@ MonoBehaviour:
     spawnCell: {x: 9, y: 8}
   unitOffset: {x: 0, y: 0, z: 0}
   reachableTile: {fileID: 11400000, guid: 15b6972f7cfb521429db087609cb86b0, type: 2}
-  playerMovementSpeed: 3
   attackTile: {fileID: 11400000, guid: 469d344fa1d980a41b98e04a2b5c0739, type: 2}
   basicAttack: {fileID: 11400000, guid: 5683cc613078cac4fa80020197fa1698, type: 2}
 --- !u!4 &305703457
@@ -351,6 +350,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerTacticalController
   attackButton: {fileID: 807333630}
+  _basicAttack: {fileID: 11400000, guid: 5683cc613078cac4fa80020197fa1698, type: 2}
 --- !u!114 &305703460
 MonoBehaviour:
   m_ObjectHideFlags: 0

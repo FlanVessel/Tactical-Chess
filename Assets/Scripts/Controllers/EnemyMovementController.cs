@@ -42,8 +42,6 @@ public class EnemyMovementController : MonoBehaviour
 
         Vector3Int destination = FindBestDestination(reachableCells, target.CurrentCell);
 
-        // Si no encontró una posición mejor,
-        // consume el movimiento y permanece en su lugar.
         if (destination == _enemyUnit.CurrentCell)
         {
             _enemyUnit.UseMovement();
