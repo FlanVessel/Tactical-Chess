@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   unitName: Enemy1
   unitSprite: {fileID: 6177166511900065722, guid: 56e91428f99b7d34aa6c433e5917246c, type: 3}
+  minHealth: 5
   maxHealth: 5
-  movePoints: 5
-  availableActions: []
+  minMoveRange: 7
+  maxMoveRange: 7
+  movementSpeed: 3
+  availableActions:
+  - {fileID: 11400000, guid: 41a77aaa9ca23db4cb39210c823efa1c, type: 2}
   startingDesperation: 50

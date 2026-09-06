@@ -14,8 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   unitName: Normal Pawn
   unitSprite: {fileID: 0}
-  maxHealth: 3
-  moveRange: 3
+  minHealth: 3
+  maxHealth: 5
+  minMoveRange: 1
+  maxMoveRange: 5
   movementSpeed: 3
-  availableActions: []
+  availableActions:
+  - {fileID: 11400000, guid: 5683cc613078cac4fa80020197fa1698, type: 2}
   startingDesperation: 50

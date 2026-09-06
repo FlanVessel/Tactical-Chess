@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2987738348631073418}
   - component: {fileID: 8364201206437388084}
   - component: {fileID: 6730158310495695962}
+  - component: {fileID: -2671187884118198458}
+  - component: {fileID: 6186207710193891009}
   m_Layer: 0
   m_Name: EnemyPawn
   m_TagString: Untagged
@@ -119,3 +121,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b56fdda503def06438d93b1b0b859da3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovementController
+--- !u!114 &-2671187884118198458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874699089756622026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3444929c9af49048bf28c576fa6f08d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitDamaged
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 1
+--- !u!114 &6186207710193891009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874699089756622026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 875fb27002ca3234183b21756e0ad45e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyIAController
+  attackDelay: 0.25

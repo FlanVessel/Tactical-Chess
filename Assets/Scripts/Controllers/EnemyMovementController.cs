@@ -38,7 +38,7 @@ public class EnemyMovementController : MonoBehaviour
 
         Dictionary<Vector3Int, Vector3Int> cameFrom = new();
 
-        HashSet<Vector3Int> reachableCells = _pathfinder.FindReachableCells(_boardTilemap, _boardOccupancy, _enemyUnit.CurrentCell, _enemyUnit.Data.MoveRange, cameFrom);
+        HashSet<Vector3Int> reachableCells = _pathfinder.FindReachableCells(_boardTilemap, _boardOccupancy, _enemyUnit.CurrentCell, _enemyUnit.MoveRange, cameFrom);
 
         Vector3Int destination = FindBestDestination(reachableCells, target.CurrentCell);
 

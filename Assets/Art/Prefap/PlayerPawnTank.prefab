@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4843342963926615177}
   - component: {fileID: 7316019947054522821}
   - component: {fileID: 4179712260366325346}
+  - component: {fileID: -6318613862846731419}
   m_Layer: 0
   m_Name: PlayerPawnTank
   m_TagString: Untagged
@@ -106,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0a1bffc27e201b47b97c7ca98a2b5d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUnit
-  unitData: {fileID: 11400000, guid: 0e71243ded4dece4fb4e793c6605c908, type: 2}
+  unitData: {fileID: 11400000, guid: 36769f4676475404da8a5df9933c49ba, type: 2}
 --- !u!114 &4179712260366325346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,3 +120,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38cab03fc923d134ab68ddbe5e24b7f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnMovementController
+--- !u!114 &-6318613862846731419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7046367023855403799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3444929c9af49048bf28c576fa6f08d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitDamaged
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 1

@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2987738348631073418}
   - component: {fileID: 8364201206437388084}
   - component: {fileID: 3319244224728610919}
+  - component: {fileID: 6484789510769856456}
+  - component: {fileID: 5197222275842042246}
   m_Layer: 0
   m_Name: EnemyPawn 1
   m_TagString: Untagged
@@ -106,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a8058ca2cec7cd4a964a680b65337c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyUnit
-  unitData: {fileID: 11400000, guid: 1d887a9ab5b90a2469aa8f56f25d734d, type: 2}
+  unitData: {fileID: 11400000, guid: 869e5a43e98910446a8f12b7b34c2486, type: 2}
 --- !u!114 &3319244224728610919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,3 +121,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b56fdda503def06438d93b1b0b859da3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovementController
+--- !u!114 &6484789510769856456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874699089756622026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3444929c9af49048bf28c576fa6f08d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitDamaged
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 1
+--- !u!114 &5197222275842042246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874699089756622026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 875fb27002ca3234183b21756e0ad45e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyIAController
+  attackDelay: 0.25

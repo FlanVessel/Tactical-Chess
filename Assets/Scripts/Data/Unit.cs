@@ -1,6 +1,6 @@
 using UnityEngine;
 using System;
-using NUnit.Framework;
+using System.Collections;
 
 public abstract class Unit : MonoBehaviour
 {
@@ -12,7 +12,12 @@ public abstract class Unit : MonoBehaviour
     protected bool hasActed;
     protected bool isActive;
     protected bool isMoving;
+
+    protected int runtimeMaxHealth;
+    protected int runtimeMoveRange;
+    
     public event Action<Unit> Died;
+    public event Action<Unit, int> Damaged;
 
     public UnitData Data => unitData;
     public Vector3Int CurrentCell => currentCell;
@@ -21,6 +26,10 @@ public abstract class Unit : MonoBehaviour
     public bool HasActed => hasActed;
     public bool IsActive => isActive;
     public bool IsMoving => isMoving;
+    
+    public int MaxHealth => runtimeMaxHealth;
+    public int MoveRange => runtimeMoveRange;
+    
     public bool IsDead => currentHealth <= 0;
 
     public virtual void Initialize(Vector3Int initialCell)
@@ -32,7 +41,11 @@ public abstract class Unit : MonoBehaviour
         }
 
         currentCell = initialCell;
-        currentHealth = unitData.MaxHealth;
+
+        runtimeMaxHealth = unitData.GenerateMaxHealth();
+        runtimeMoveRange = unitData.GenerateMoveRange();
+        
+        currentHealth = runtimeMaxHealth;
 
         hasMoved = false;
         hasActed = false;
@@ -101,7 +114,6 @@ public abstract class Unit : MonoBehaviour
     public void TakeDamage(int amount)
     {
         if (IsDead) return;
-
         if (amount <= 0)
         {
             Debug.Log($"Dano recibido: {amount}.");
@@ -109,10 +121,12 @@ public abstract class Unit : MonoBehaviour
         }
 
         currentHealth = Mathf.Max(0, currentHealth - amount);
+        Damaged?.Invoke(this, amount);
 
-        Debug.Log($"{name} recibio {amount} de dano. " + $"Vida: {currentHealth}/{unitData.MaxHealth}");
-
+        Debug.Log($"{name} recibio {amount} de dano. " + $"Vida: {currentHealth}/{runtimeMaxHealth}");
+        
         if (currentHealth == 0) Die();
+        if (IsDead) Die();
     }
 
     private void Heal(int amount)
@@ -125,9 +139,9 @@ public abstract class Unit : MonoBehaviour
             return;
         }
 
-        currentHealth = Mathf.Min(unitData.MaxHealth, currentHealth + amount);
+        currentHealth = Mathf.Min(runtimeMaxHealth, currentHealth + amount);
 
-        Debug.Log($"{name} recupero esta cantidad de de vida: {amount}." + $"Vida Actual: {currentHealth}/{unitData.MaxHealth}");
+        Debug.Log($"{name} recupero esta cantidad de de vida: {amount}." + $"Vida Actual: {currentHealth}/{runtimeMaxHealth}");
     }
 
     protected virtual void Die()

@@ -78,7 +78,7 @@ public class TurnMovementController : MonoBehaviour
                 Vector3Int next = current + direction;
                 int nextDistance = currentDistance + 1;
 
-                if (nextDistance > _unit.Data.MoveRange) continue;
+                if (nextDistance > _unit.MoveRange) continue;
 
                 if (!_boardTilemap.HasTile(next)) continue;
 

@@ -72,6 +72,8 @@ public class TurnManager : MonoBehaviour
 
     private void BeginPlayerTurn()
     {
+        if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) return;
+        
         _currentPhase = BattlePhase.PlayerTurn;
         _roundNumber++;
 
@@ -88,6 +90,8 @@ public class TurnManager : MonoBehaviour
 
     private void BeginEnemyTurn()
     {
+        if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) return;
+        
         _currentPhase = BattlePhase.EnemyTurn;
 
         foreach (EnemyUnit enemyUnit in _enemyUnits)
@@ -107,15 +111,17 @@ public class TurnManager : MonoBehaviour
             if (enemyUnit == null) continue;
             if (enemyUnit.IsDead) continue;
 
-            EnemyMovementController enemyMovementController = enemyUnit.GetComponent<EnemyMovementController>();
+            EnemyIAController iaController = enemyUnit.GetComponent<EnemyIAController>();
 
-            if (enemyMovementController == null)
+            if (iaController == null)
             {
-                Debug.Log($"{enemyUnit.name} no tinene EnemyMovementController.");
+                Debug.LogWarning($"{enemyUnit.name} no tinene EnemyIAController.");
                 continue;
             }
 
-            yield return enemyMovementController.ExecuteMovement(_playerUnits);
+            yield return iaController.ExecuteTurn(_playerUnits);
+
+            if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) yield break;
 
             yield return new WaitForSeconds(temporaryEnemyTurnDuration);
         }
@@ -141,5 +147,72 @@ public class TurnManager : MonoBehaviour
         if (_boardOccupancy != null) _boardOccupancy.RemoveUnit(deadUnit);
 
         Debug.Log($"{deadUnit.name} fue retirado del tablero.");
+
+        CheckBattleResult();
+    }
+
+    private void CheckBattleResult()
+    {
+        bool livePlayers = false;
+        bool liveEnemies = false;
+
+        foreach (PlayerUnit playerUnit in _playerUnits)
+        {
+            if (playerUnit != null && !playerUnit.IsDead)
+            {
+                livePlayers = true;
+                break;
+            }
+        }
+
+        foreach (EnemyUnit enemyUnit in _enemyUnits)
+        {
+            if (enemyUnit != null && !enemyUnit.IsDead)
+            {
+                liveEnemies = true;
+                break;
+            }
+        }
+
+        if (!liveEnemies)
+        {
+            FinishBattle(BattlePhase.Victory);
+            return;
+        }
+
+        if (!livePlayers)
+        {
+            FinishBattle(BattlePhase.Defeat);
+        }
+    }
+
+    private void FinishBattle(BattlePhase result)
+    {
+        if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) return;
+
+        _currentPhase = result;
+        
+        if (_playerController != null) _playerController.SetInputEnabled(false);
+
+        foreach (PlayerUnit playerUnit in _playerUnits)
+        {
+            if (playerUnit == null) continue;
+            playerUnit.EndTurn();
+        }
+
+        foreach (EnemyUnit enemyUnit in _enemyUnits)
+        {
+            if (enemyUnit == null) continue;
+            enemyUnit.EndTurn();
+        }
+
+        if (result == BattlePhase.Victory)
+        {
+            Debug.Log("Victoria!");
+        }
+        else
+        {
+            Debug.Log("Derrota");
+        }
     }
 }
