@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4179712260366325346}
   - component: {fileID: 5052626920142431028}
   - component: {fileID: -6149789431593970772}
+  - component: {fileID: 1341470924427270881}
   m_Layer: 0
   m_Name: PlayerPawnHealer
   m_TagString: Untagged
@@ -147,3 +148,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64a9016d28d9e6047a6cc38d036eaf28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitCombatController
+--- !u!114 &1341470924427270881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7046367023855403799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42478ac9f541a9b43bd1932991041f6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PawnDeckController

@@ -1,6 +1,8 @@
 using UnityEngine;
+public enum UnitActionType {Damage, Heal}
 
 [CreateAssetMenu(fileName = "NewUnitAction", menuName = "Units/Unit Action")]
+
 
 public class UnitActionData : ScriptableObject
 {
@@ -9,7 +11,8 @@ public class UnitActionData : ScriptableObject
     [SerializeField] private Sprite actionIcon;
 
     [Header("Ataque")] 
-    [SerializeField, Min(0)] private int damage = 1;
+    [SerializeField] private UnitActionType actionType;
+    [SerializeField, Min(0)] private int effectAmount = 1;
     [SerializeField, Min(1)] private int attackRange = 1;
 
     [Header("Costes")]
@@ -19,9 +22,12 @@ public class UnitActionData : ScriptableObject
     public string ActionName => actionName;
     public Sprite ActionIcon => actionIcon;
     
-    public int Damage => damage;
+    public UnitActionType ActionType => actionType;
+    public int EffectAmount => effectAmount;
     public int AttackRange => attackRange;
-
+    
     public int MoveCost => moveCost;
     public int ActionPointCost => actionPointCost;
+    
+    public int Damage => effectAmount;
 }

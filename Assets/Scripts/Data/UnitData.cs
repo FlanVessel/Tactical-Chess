@@ -10,6 +10,9 @@ public class UnitData : ScriptableObject
     [Header("Identidad")]
     [SerializeField] private string unitName;
     [SerializeField] private Sprite unitSprite;
+    
+    [Header("Mazo o Deck")]
+    [SerializeField] private DeckData startingDeck;
 
     [Header("Estadisticas")]
     [SerializeField, Min(1)] private int minHealth = 3;
@@ -28,6 +31,8 @@ public class UnitData : ScriptableObject
 
     public string UnitName => unitName;
     public Sprite UnitSprite => unitSprite;
+    
+    public DeckData StartingDeck => startingDeck;
 
     public int MinHealth => minHealth;
     public int MaxHealth => maxHealth;
