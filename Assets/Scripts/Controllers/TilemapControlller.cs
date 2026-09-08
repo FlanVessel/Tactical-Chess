@@ -20,7 +20,6 @@ public class TilemapControlller : MonoBehaviour
 
     [Header("Configuracion de Ataque")]
     [SerializeField] private TileBase attackTile;
-    [SerializeField] private UnitActionData basicAttack;
 
     private Tilemap _highlighTilemap;
     private Tilemap _boardTilemap;
@@ -147,6 +146,8 @@ public class TilemapControlller : MonoBehaviour
             Destroy(unitObject);
             return;
         }
+        
+        ConfigureCombat(unitObject);
 
         _turnManager.RegisterUnit(unit);
 
@@ -167,7 +168,7 @@ public class TilemapControlller : MonoBehaviour
 
         if (_playerTacticalController == null) _playerTacticalController = gameObject.AddComponent<PlayerTacticalController>();
 
-        _playerTacticalController.Setup(_boardTilemap, Camera.main, _boardOccupancy, _highlighTilemap, attackTile, basicAttack);
+        _playerTacticalController.Setup(_boardTilemap, Camera.main, _highlighTilemap, attackTile);
     }
 
     private void ConfigureMovement(GameObject unitObject, Unit unit, Vector3Int cellPosition)
@@ -253,6 +254,15 @@ public class TilemapControlller : MonoBehaviour
         if (_turnManager == null) _turnManager = gameObject.AddComponent<TurnManager>();
 
         _turnManager.Setup(_playerTacticalController, _boardOccupancy);
+    }
+
+    private void ConfigureCombat(GameObject unitObject)
+    {
+        UnitCombatController combat = unitObject.GetComponent<UnitCombatController>();
+
+        if (combat == null) return;
+        
+        combat.SetUp(_boardTilemap, _boardOccupancy);
     }
 
 }

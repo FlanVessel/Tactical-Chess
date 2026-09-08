@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3319244224728610919}
   - component: {fileID: 6484789510769856456}
   - component: {fileID: 5197222275842042246}
+  - component: {fileID: 2077345798932439805}
   m_Layer: 0
   m_Name: EnemyPawn 1
   m_TagString: Untagged
@@ -148,3 +149,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyIAController
   attackDelay: 0.25
+--- !u!114 &2077345798932439805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874699089756622026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64a9016d28d9e6047a6cc38d036eaf28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitCombatController

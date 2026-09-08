@@ -15,5 +15,6 @@ MonoBehaviour:
   actionName: Basic Pawn Attack
   actionIcon: {fileID: 0}
   damage: 3
+  attackRange: 1
   moveCost: 0
   actionPointCost: 0

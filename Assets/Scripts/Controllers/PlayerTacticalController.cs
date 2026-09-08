@@ -12,17 +12,15 @@ public class PlayerTacticalController : MonoBehaviour
 
     private readonly List<PlayerUnit> _playerUnits = new();
 
-    private static readonly Vector3Int[] AttackDirections = {new Vector3Int(1, 1, 0), new Vector3Int(-1, 1, 0), new Vector3Int(1, -1, 0), new Vector3Int(-1, -1, 0)};
-
     private PlayerUnit _selectedUnit;
     private TurnMovementController _selectedMovement;
 
     [SerializeField] private Button attackButton;
-
-    private BoardOccupancy _boardOccupancy;
+    
     private Tilemap _highlightTilemap;
     private TileBase _attackTile;
-    [SerializeField] private UnitActionData _basicAttack;
+    private UnitCombatController _selectedCombat;
+    private UnitActionData _selectedAction;
 
     private bool _attackMode;
 
@@ -30,14 +28,12 @@ public class PlayerTacticalController : MonoBehaviour
 
     private bool _inputEnabled;
 
-    public void Setup(Tilemap boardTilemap, Camera gameCamera, BoardOccupancy boardOccupancy, Tilemap highlightTilemap, TileBase attackTile, UnitActionData basicAttack)
+    public void Setup(Tilemap boardTilemap, Camera gameCamera, Tilemap highlightTilemap, TileBase attackTile)
     {
         _boardTilemap = boardTilemap;
         _gameCamera = gameCamera;
-        _boardOccupancy = boardOccupancy;
         _highlightTilemap = highlightTilemap;
         _attackTile = attackTile;
-        _basicAttack = basicAttack;
 
         UpdateAttackButton();
     }
@@ -118,6 +114,7 @@ public class PlayerTacticalController : MonoBehaviour
         if (!unit.Select()) return;
 
         TurnMovementController movement = unit.GetComponent<TurnMovementController>();
+        UnitCombatController combat = unit.GetComponent<UnitCombatController>();
 
         if (movement == null)
         {  
@@ -125,9 +122,17 @@ public class PlayerTacticalController : MonoBehaviour
             Debug.LogError($"{unit.name} no tiene TurnMovementController.");
             return;
         }
+        
+        if (combat == null)
+        {  
+            unit.Deselect();
+            Debug.LogError($"{unit.name} no tiene UnitCombatController.");
+            return;
+        }
 
         _selectedUnit = unit;
         _selectedMovement = movement;
+        _selectedCombat = combat;
 
         _selectedMovement.ShowReachableCells();
         UpdateAttackButton();
@@ -141,6 +146,8 @@ public class PlayerTacticalController : MonoBehaviour
 
         _selectedUnit = null;
         _selectedMovement = null;
+        _selectedCombat = null;
+        _selectedAction = null;
 
         CancelAttackMode();
         UpdateAttackButton();
@@ -159,8 +166,12 @@ public class PlayerTacticalController : MonoBehaviour
     {
         if (!_inputEnabled) return;
         if (_selectedUnit == null) return;
+        if (_selectedCombat == null) return;
         if (!_selectedUnit.CanAct()) return;
-        if (_basicAttack == null) return;
+
+        _selectedAction = GetBasicAttack();
+        
+        if (_selectedAction == null) return;
 
         _attackMode = true;
 
@@ -173,16 +184,14 @@ public class PlayerTacticalController : MonoBehaviour
     {
         ClearAttackCells();
 
-        if (_selectedUnit == null) return;
+        if (_selectedCombat == null || _selectedAction == null) return;
 
-        foreach (Vector3Int direction in AttackDirections)
+        HashSet<Vector3Int> cells = _selectedCombat.GetAttackCells(_selectedAction);
+
+        foreach (Vector3Int cell in cells)
         {
-            Vector3Int attackCell = _selectedUnit.CurrentCell + direction;
-
-            if (!_boardTilemap.HasTile(attackCell)) continue;
-
-            _attackCells.Add(attackCell);
-            _highlightTilemap.SetTile(attackCell, _attackTile);
+            _attackCells.Add(cell);
+            _highlightTilemap.SetTile(cell, _attackTile);
         }
     }
 
@@ -195,32 +204,15 @@ public class PlayerTacticalController : MonoBehaviour
             return;
         }
 
-        Unit target = _boardOccupancy.GetUnitAt(clickedCell);
+        bool attacked = _selectedCombat.TryAttack(clickedCell, _selectedAction);
 
-        if (target == null)
+        if (!attacked)
         {
             Debug.Log("No hay ninguna unidad en esta casilla.");
             CancelAttackMode();
+            UpdateAttackButton();
             return;
         }
-
-        if (target is not EnemyUnit)
-        {
-            Debug.Log("El Ataque basico ataca enemigos.");
-            CancelAttackMode();
-            return;
-        }
-
-        if (!_selectedUnit.UseAction())
-        {
-            Debug.Log("El peon ya utilizo su accion.");
-            CancelAttackMode();
-            return;
-        }
-
-        Debug.Log($"{_selectedUnit.name} usa {_basicAttack.ActionName} " + $"contra {target.name}.");
-
-        target.TakeDamage(_basicAttack.Damage);
 
         CancelAttackMode();
         UpdateAttackButton();
@@ -244,5 +236,13 @@ public class PlayerTacticalController : MonoBehaviour
     {
         _attackMode = false;
         ClearAttackCells();
+    }
+
+    private UnitActionData GetBasicAttack()
+    {
+        if (_selectedUnit == null) return null;
+        if (_selectedUnit.Data.AvailableActions.Count == 0) return null;
+        
+        return _selectedUnit.Data.AvailableActions[0];
     }
 }

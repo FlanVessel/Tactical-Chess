@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7316019947054522821}
   - component: {fileID: 4179712260366325346}
   - component: {fileID: 5052626920142431028}
+  - component: {fileID: -6149789431593970772}
   m_Layer: 0
   m_Name: PlayerPawnHealer
   m_TagString: Untagged
@@ -134,3 +135,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitDamaged
   damageColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 1
+--- !u!114 &-6149789431593970772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7046367023855403799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64a9016d28d9e6047a6cc38d036eaf28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitCombatController
