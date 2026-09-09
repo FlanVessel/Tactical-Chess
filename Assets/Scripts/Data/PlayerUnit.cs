@@ -34,6 +34,10 @@ public class PlayerUnit : Unit
     {
         base.BeginTurn();
         isSelected = false;
+
+        if (_deckController == null) return;
+        
+        _deckController.RestoreCard();
     }
 
     public override void EndTurn()

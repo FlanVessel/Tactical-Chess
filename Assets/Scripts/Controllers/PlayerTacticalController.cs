@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
@@ -12,6 +13,8 @@ public class PlayerTacticalController : MonoBehaviour
     private Tilemap _boardTilemap;
 
     private readonly List<PlayerUnit> _playerUnits = new();
+    [Header("Informacion del Peon")]
+    [SerializeField] private SelectedUnitUI _selectedUnitUI;
 
     private PlayerUnit _selectedUnit;
     private TurnMovementController _selectedMovement;
@@ -28,6 +31,8 @@ public class PlayerTacticalController : MonoBehaviour
     private bool _attackMode;
     
     private CardData _selectedCard; 
+    
+    private UnitActionExecutor _selectedActionExecutor;
 
     private readonly HashSet<Vector3Int> _attackCells = new();
 
@@ -36,6 +41,7 @@ public class PlayerTacticalController : MonoBehaviour
     private void Awake()
     {
         if (cardHandUI != null) cardHandUI.HideHand();
+        if (_selectedUnitUI != null) _selectedUnitUI.Hide();
     }
 
     public void Setup(Tilemap boardTilemap, Camera gameCamera, Tilemap highlightTilemap, TileBase attackTile)
@@ -125,6 +131,7 @@ public class PlayerTacticalController : MonoBehaviour
 
         TurnMovementController movement = unit.GetComponent<TurnMovementController>();
         UnitCombatController combat = unit.GetComponent<UnitCombatController>();
+        UnitActionExecutor actionExecutor = unit.GetComponent<UnitActionExecutor>();
 
         if (movement == null)
         {  
@@ -140,12 +147,22 @@ public class PlayerTacticalController : MonoBehaviour
             return;
         }
 
+        if (actionExecutor == null)
+        {
+            unit.Deselect();
+            Debug.LogError($"{unit.name} no tiene UnitActionExecutor.");
+            return;
+        }
+
         _selectedUnit = unit;
         _selectedMovement = movement;
         _selectedCombat = combat;
-
+        _selectedActionExecutor = actionExecutor;
+        
         _selectedMovement.ShowReachableCells();
+        
         ShowSelectedUnitHand();
+        if (_selectedUnitUI != null) _selectedUnitUI.Show(_selectedUnit);
         UpdateAttackButton();
     }
 
@@ -160,10 +177,12 @@ public class PlayerTacticalController : MonoBehaviour
         _selectedCombat = null;
         _selectedAction = null;
         _selectedCard  = null;
+        _selectedActionExecutor = null;
 
         CancelAttackMode();
         
         if (cardHandUI != null) cardHandUI.HideHand();
+        if (_selectedUnitUI != null) _selectedUnitUI.Hide();
         
         UpdateAttackButton();
     }
@@ -291,6 +310,7 @@ public class PlayerTacticalController : MonoBehaviour
     {
         if (card == null) return;
         if (_selectedUnit == null) return; 
+        if (_selectedActionExecutor  == null) return;
         
         _selectedCard = card; 
         
@@ -300,5 +320,14 @@ public class PlayerTacticalController : MonoBehaviour
         {
             Debug.Log($"Accion: {_selectedCard.Action.ActionName}, " + $"Tipo: {_selectedCard.Action.ActionType}, " + $"Cantidad: {_selectedCard.Action.EffectAmount}");
         }
+        
+        bool usedDamageBonus = _selectedActionExecutor.TryUseCard(card);
+
+        if (!usedDamageBonus)
+        {
+            Debug.Log($"No fue posible utilizar {card.CardName}.");
+            return;
+        }
+        ShowSelectedUnitHand();
     }
 }

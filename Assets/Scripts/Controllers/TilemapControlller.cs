@@ -136,7 +136,7 @@ public class TilemapControlller : MonoBehaviour
             return;
         }
 
-        unitObject.name = $"{config.Prefap.name}_Cell_" + $"{configCell.x}_{configCell.y}";
+        unitObject.name = $"{config.Prefap.name}";
 
         unit.Initialize(cellPosition);
 

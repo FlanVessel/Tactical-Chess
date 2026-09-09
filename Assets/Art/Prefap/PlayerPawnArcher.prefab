@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 773829674088540000}
   - component: {fileID: 4469370615984700167}
   - component: {fileID: 8260621115012297772}
+  - component: {fileID: -284797577228616560}
   m_Layer: 0
   m_Name: PlayerPawnArcher
   m_TagString: Untagged
@@ -86,7 +87,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2041810561455165220, guid: d32249ebedc52a14093107235368c09e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ff5770b11a754ef4291574e85f7f2da2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -160,3 +161,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42478ac9f541a9b43bd1932991041f6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawnDeckController
+--- !u!114 &-284797577228616560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7046367023855403799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c7e48e4a0d775468122307a1a4aeea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitActionExecutor

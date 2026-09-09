@@ -53,9 +53,12 @@ public class UnitCombatController : MonoBehaviour
         if (!IsEnemy(target)) return false;
         if (!_unit.UseAction()) return false;
         
-        target.TakeDamage(actionData.Damage);
+        int baseDamage = actionData.Damage;
         
-        Debug.Log($"{_unit.name} usa {actionData.ActionName} contra " + $"{target.name} y causa {actionData.Damage} da dano.");
+        int finalDamage = _unit.CalculateAttackDamage(baseDamage);
+        target.TakeDamage(finalDamage);
+        
+        Debug.Log($"{_unit.name} usa {actionData.ActionName} contra " + $"{target.name} y causa {finalDamage} da daño.");
         return true;
     }
 

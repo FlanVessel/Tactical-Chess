@@ -61,6 +61,37 @@ public class PawnDeckController : MonoBehaviour
         return true;
     }
 
+    public bool HasCardInHand(CardData card)
+    {
+        if (card == null) return false;
+        return _hand.Contains(card);
+    }
+
+    public bool UseCard(CardData card)
+    {
+        if (!HasCardInHand(card)) return false;
+        
+        _hand.Remove(card);
+        _discardPile.Add(card);
+        
+        Debug.Log($"{name} utilizo {card.CardName} {card.Description} " + $"Cartas restantes: {_hand.Count}");
+        return true;
+    }
+
+    public void RestoreCard()
+    {
+        if (_discardPile.Count == 0) return;
+
+        foreach (CardData card in _discardPile)
+        {
+            if  (card == null) continue;
+            _hand.Add(card);
+        }
+        _discardPile.Clear();
+        
+        Debug.Log($"{name} recupero sus cartas.");
+    }
+
     private void PrintHand()
     {
         Debug.Log($"{name} recibió {_hand.Count} cartas:");

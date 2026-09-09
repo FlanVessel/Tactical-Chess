@@ -15,5 +15,5 @@ MonoBehaviour:
   cardName: "Curaci\xF3n"
   cardImage: {fileID: 0}
   description: Recuperas 3 puntos de vida
-  manaCost: 1
+  manaCost: 2
   action: {fileID: 11400000, guid: 89a3e972b70c29b41a01178e98d4e549, type: 2}

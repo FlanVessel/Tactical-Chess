@@ -15,5 +15,5 @@ MonoBehaviour:
   cardName: Golpe
   cardImage: {fileID: 0}
   description: "Aumenta +1  da\xF1o "
-  manaCost: 1
+  manaCost: 2
   action: {fileID: 11400000, guid: 3385dc4da34511c49b4d8afe7263b478, type: 2}
