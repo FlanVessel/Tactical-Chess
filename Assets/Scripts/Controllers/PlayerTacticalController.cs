@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -17,16 +18,25 @@ public class PlayerTacticalController : MonoBehaviour
 
     [SerializeField] private Button attackButton;
     
+    [SerializeField] private CardHandUI cardHandUI;
+    
     private Tilemap _highlightTilemap;
     private TileBase _attackTile;
     private UnitCombatController _selectedCombat;
     private UnitActionData _selectedAction;
 
     private bool _attackMode;
+    
+    private CardData _selectedCard; 
 
     private readonly HashSet<Vector3Int> _attackCells = new();
 
     private bool _inputEnabled;
+    
+    private void Awake()
+    {
+        if (cardHandUI != null) cardHandUI.HideHand();
+    }
 
     public void Setup(Tilemap boardTilemap, Camera gameCamera, Tilemap highlightTilemap, TileBase attackTile)
     {
@@ -135,6 +145,7 @@ public class PlayerTacticalController : MonoBehaviour
         _selectedCombat = combat;
 
         _selectedMovement.ShowReachableCells();
+        ShowSelectedUnitHand();
         UpdateAttackButton();
     }
 
@@ -148,8 +159,12 @@ public class PlayerTacticalController : MonoBehaviour
         _selectedMovement = null;
         _selectedCombat = null;
         _selectedAction = null;
+        _selectedCard  = null;
 
         CancelAttackMode();
+        
+        if (cardHandUI != null) cardHandUI.HideHand();
+        
         UpdateAttackButton();
     }
 
@@ -244,5 +259,46 @@ public class PlayerTacticalController : MonoBehaviour
         if (_selectedUnit.Data.AvailableActions.Count == 0) return null;
         
         return _selectedUnit.Data.AvailableActions[0];
+    }
+
+    private void ShowSelectedUnitHand()
+    {
+        if (cardHandUI == null)
+        {
+            Debug.LogWarning($"El PlayerTacticalController {name} no tiene CardHandUI.");
+            return;
+        }
+
+        if (_selectedUnit == null)
+        {
+            cardHandUI.HideHand();
+            return;
+        }
+        
+        PawnDeckController deckController = _selectedUnit.DeckController;
+
+        if (deckController == null)
+        {
+            Debug.LogWarning($"{_selectedUnit.name} no tiene un mazo.");
+            cardHandUI.HideHand();
+            return;
+        }
+        
+        cardHandUI.ShowHand(deckController.Hand, HandleCardSelected);
+    }
+
+    private void HandleCardSelected(CardData card)
+    {
+        if (card == null) return;
+        if (_selectedUnit == null) return; 
+        
+        _selectedCard = card; 
+        
+        Debug.Log($"{_selectedUnit.name} selecciono la carta " + $"{_selectedCard.CardName}.");
+
+        if (_selectedCard.Action != null)
+        {
+            Debug.Log($"Accion: {_selectedCard.Action.ActionName}, " + $"Tipo: {_selectedCard.Action.ActionType}, " + $"Cantidad: {_selectedCard.Action.EffectAmount}");
+        }
     }
 }
