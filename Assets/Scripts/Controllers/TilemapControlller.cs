@@ -20,6 +20,9 @@ public class TilemapControlller : MonoBehaviour
 
     [Header("Configuracion de Ataque")]
     [SerializeField] private TileBase attackTile;
+    
+    [Header("Interfaz")]
+    [SerializeField] private BattleResultUI  battleResultUI;
 
     private Tilemap _highlighTilemap;
     private Tilemap _boardTilemap;
@@ -38,6 +41,7 @@ public class TilemapControlller : MonoBehaviour
         SetUpBoardOccupancy();
         SetupPlayerTacticalController();
         SetupTurnManager();
+        SetupBattleResultUI();
 
         SpawnUnits(playerSpawns);
         SpawnUnits(enemySpawns);
@@ -254,6 +258,16 @@ public class TilemapControlller : MonoBehaviour
         if (_turnManager == null) _turnManager = gameObject.AddComponent<TurnManager>();
 
         _turnManager.Setup(_playerTacticalController, _boardOccupancy);
+    }
+
+    private void SetupBattleResultUI()
+    {
+        if (battleResultUI == null)
+        {
+            Debug.LogError($"No hay un BattleResultUI");
+            return;
+        }
+        battleResultUI.Setup(_turnManager);
     }
 
     private void ConfigureCombat(GameObject unitObject)

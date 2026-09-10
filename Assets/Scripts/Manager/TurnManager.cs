@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 public enum BattlePhase{Preparing, PlayerTurn, EnemyTurn, Victory, Defeat}
 
@@ -18,6 +19,8 @@ public class TurnManager : MonoBehaviour
 
     private BattlePhase _currentPhase = BattlePhase.Preparing;
     private int _roundNumber;
+
+    public event Action<BattlePhase> PhaseChanged;
 
     public BattlePhase CurrentPhase => _currentPhase;
     public int RoundNumber => _roundNumber;
@@ -74,7 +77,7 @@ public class TurnManager : MonoBehaviour
     {
         if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) return;
         
-        _currentPhase = BattlePhase.PlayerTurn;
+        ChangePhase(BattlePhase.PlayerTurn);
         _roundNumber++;
 
         foreach (PlayerUnit playerUnit in _playerUnits)
@@ -92,7 +95,7 @@ public class TurnManager : MonoBehaviour
     {
         if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) return;
         
-        _currentPhase = BattlePhase.EnemyTurn;
+        ChangePhase(BattlePhase.EnemyTurn);
 
         foreach (EnemyUnit enemyUnit in _enemyUnits)
         {
@@ -151,7 +154,7 @@ public class TurnManager : MonoBehaviour
         CheckBattleResult();
     }
 
-    private void CheckBattleResult()
+    private void CheckBattleResults()
     {
         bool livePlayers = false;
         bool liveEnemies = false;
@@ -215,4 +218,49 @@ public class TurnManager : MonoBehaviour
             Debug.Log("Derrota");
         }
     }
+    
+    private void ChangePhase(BattlePhase newPhase)
+    {
+        _currentPhase = newPhase;
+        PhaseChanged?.Invoke(_currentPhase);
+        Debug.Log($"Nueva fase: {_currentPhase}");
+    }
+    
+    private void DeclareVictory()
+    {
+        if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) return;
+
+        StopAllCoroutines();
+
+        if (_playerController != null) _playerController.SetInputEnabled(false);
+
+        ChangePhase(BattlePhase.Victory);
+    }
+
+    private void DeclareDefeat()
+    {
+        if (_currentPhase == BattlePhase.Victory || _currentPhase == BattlePhase.Defeat) return;
+
+        StopAllCoroutines();
+
+        if (_playerController != null) _playerController.SetInputEnabled(false);
+
+        ChangePhase(BattlePhase.Defeat);
+    }
+    
+    private void CheckBattleResult()
+    {
+        _playerUnits.RemoveAll(unit => unit == null || unit.IsDead);
+
+        _enemyUnits.RemoveAll(unit => unit == null || unit.IsDead);
+
+        if (_enemyUnits.Count == 0)
+        {
+            DeclareVictory();
+            return;
+        }
+
+        if (_playerUnits.Count == 0) DeclareDefeat();
+    }
+
 }
