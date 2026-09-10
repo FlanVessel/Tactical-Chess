@@ -14,8 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitActionData
   actionName: Basic Pawn Attack
   actionIcon: {fileID: 0}
-  actionType: 0
+  actionType: 2
   effectAmount: 1
   attackRange: 1
-  moveCost: 0
-  actionPointCost: 0

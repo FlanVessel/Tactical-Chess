@@ -3,6 +3,7 @@ using UnityEngine;
 public class UnitActionExecutor : MonoBehaviour
 {
     private Unit _unit;
+    private UnitActionData _unitAction;
     private PawnDeckController _deckController;
 
     private void Awake()

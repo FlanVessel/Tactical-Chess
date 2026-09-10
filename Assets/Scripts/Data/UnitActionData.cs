@@ -1,5 +1,5 @@
 using UnityEngine;
-public enum UnitActionType {IncreaseDamage, Heal}
+public enum UnitActionType {IncreaseDamage, Heal, Damage}
 
 [CreateAssetMenu(fileName = "NewUnitAction", menuName = "Units/Unit Action")]
 
