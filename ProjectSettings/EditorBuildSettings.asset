@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Probando.unity
+    guid: 402bef961292a394d8bbb67f1b747454
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: cd29667788890f64493b4bea1c7e8b4a
+  - enabled: 1
+    path: Assets/Scenes/LocalLobby.unity
+    guid: af5609aafbc063a47a731aea99cbf38a
+  - enabled: 1
     path: Assets/Scenes/TestMapProcedural.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
