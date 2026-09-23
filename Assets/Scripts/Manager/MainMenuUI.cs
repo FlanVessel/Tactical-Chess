@@ -2,16 +2,16 @@ using UnityEngine;
 
 public class MainMenuUI : MonoBehaviour
 {
-    public void StartSinglePlayerGame()
+    public void StartSinglePlayer()
     {
         if (GameManager.Instance == null) return;
-        GameManager.Instance.OpenBattle();
+        GameManager.Instance.StartSinglePlayerGame();
     }
     
-    public void StartLocalMultiplayerGame()
+    public void StartLocalMultiplayer()
     {
         if (GameManager.Instance == null) return;
-        GameManager.Instance.OpenLocalLobby();
+        GameManager.Instance.StartLocalMultiplayerGame();
     }
     
     public void ExitGame()
