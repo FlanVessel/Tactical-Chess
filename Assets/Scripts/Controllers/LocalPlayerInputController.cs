@@ -23,7 +23,7 @@ public class LocalPlayerInputController : MonoBehaviour
 
     private void Awake()
     {
-        _playerInput = GetComponent<PlayerInput>();
+        
     }
 
     public bool Setup(LocalPlayerData playerData)

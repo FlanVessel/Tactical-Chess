@@ -88,6 +88,22 @@ public class GameManager : MonoBehaviour
         LoadScene("LocalLobby");
     }
 
+    public void StartLocalBattleGame()
+    {
+        if (_gameSet == null) return;
+
+        ChangeState(GameState.Battle);
+        LoadScene("LocalBattle");
+    }
+
+    public void ReturnToMenu()
+    {
+        if (_gameSet == null) return;
+
+        ChangeState(GameState.MainMenu);
+        LoadScene("MainMenu");
+    }
+
     private void LoadScene(string sceneName)
     {
         if (_sceneLoader == null)
