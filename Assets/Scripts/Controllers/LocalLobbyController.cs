@@ -100,24 +100,138 @@ public class LocalLobbyController : MonoBehaviour
     
     private void HandleNavigateRequested(LocalPlayerInputController inputController, int direction)
     {
-        string directionName = direction > 0 ? "derecha" : "izquierda";
-        Debug.Log($"{inputController.PlayerData.DeviceName} " + $"navega hacia la {directionName}.");
+        LocalPlayerData player = inputController.PlayerData;
+        
+        if (player == null) return;
+        if (player.IsReady) return;
+        
+        player.MoveSelectedSlot(direction, playerSlots.Length);
+        RefreshLobbyUI();
     }
 
     private void HandleSubmitRequested(LocalPlayerInputController inputController)
     {
-        Debug.Log($"{inputController.PlayerData.DeviceName} presionó confirmar.");
+        LocalPlayerData player = inputController.PlayerData;
+        
+        if (player == null) return;
+
+        int selectedSlot = player.SelectedSlotIndex;
+        
+        if (player.SlotIndex < 0)
+        {
+            if (IsSlotOccupied(selectedSlot))
+            {
+                Debug.Log($"El espacio {selectedSlot + 1} ya esta ocupado.");
+                return;
+            }
+            player.AssignSlot(selectedSlot);
+            Debug.Log($"{player.DeviceName} ocupo el espacio {selectedSlot + 1}.");
+        }
+        else
+        {
+            player.SetReady(true);
+            Debug.Log($"{player.DeviceName} esta listo en {selectedSlot + 1}.");
+        }
+        RefreshLobbyUI();
     }
 
     private void HandleCancelRequested(LocalPlayerInputController inputController)
     {
-        Debug.Log($"{inputController.PlayerData.DeviceName} presionó cancelar.");
+        LocalPlayerData player = inputController.PlayerData;
+        
+        if (player == null) return;
+
+        if (player.IsReady)
+        {
+            player.SetReady(false);
+            Debug.Log($"{player.DeviceName} no esta listo.");
+        }
+        else if (player.SlotIndex >= 0)
+        {
+            player.RealeaseSlot();
+            Debug.Log($"{player.DeviceName} solto su lugar.");
+        }
+        else
+        {
+            Debug.Log($"{player.DeviceName} todavia no tiene un lugar.");
+        }
+        RefreshLobbyUI();
     }
 
     private void HandlePlayerLeft(PlayerInput playerInput)
     {
         if (_gameSet == null || playerInput == null) return;
         _gameSet.RemoveLocalPlayer(playerInput.user.id);
+    }
+
+    private bool IsSlotOccupied(int slotIndex)
+    {
+        foreach (LocalPlayerData player in _gameSet.Players)
+        {
+            if (player == null) continue;
+            if (player.SlotIndex == slotIndex) return true;
+        }
+        return false;
+    }
+
+    private void RefreshLobbyUI()
+    {
+        for (int i = 0; i < playerSlots.Length; i++)
+        {
+            PlayerSlotUI slotUI = playerSlots[i];
+            
+            if (slotUI == null) continue;
+            
+            LocalPlayerData occupant = FindPlayerInSlot(i);
+
+            if (occupant == null)
+            {
+                slotUI.ShowAvailable();
+            }
+            else if (occupant.IsReady)
+            {
+                slotUI.ShowReady(occupant);
+            }
+            else
+            {
+                slotUI.ShowOccupied(occupant);
+            }
+            
+            slotUI.ShowSelection(false, Color.white);
+        }
+
+        foreach (LocalPlayerData player in _gameSet.Players)
+        {
+            if (player == null || player.IsReady) continue;
+            
+            int selectedSlot = player.SelectedSlotIndex;
+
+            if (selectedSlot < 0 || selectedSlot >= playerSlots.Length) continue;
+            
+            playerSlots[selectedSlot].ShowSelection(true, GetPlayerColor(player.PlayerIndex));
+        }
+    }
+
+    private LocalPlayerData FindPlayerInSlot(int slotIndex)
+    {
+        foreach (LocalPlayerData player in _gameSet.Players)
+        {
+            if (player == null) continue;
+            if (player.SlotIndex == slotIndex) return player;
+        }
+        return null;
+    }
+
+    private Color GetPlayerColor(int playerIndex)
+    {
+        return playerIndex switch
+        {
+            0 => Color.cyan,
+            1 => Color.yellow,
+            2 => Color.green,
+            3 => Color.blue,
+            _ => Color.white
+        };
     }
 
     private string GetDeviceDisplayName(PlayerInput playerInput)
