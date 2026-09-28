@@ -1,5 +1,7 @@
 using System;
 
+public enum LocalDeviceType {None, KeyboardMouse, Xbox, Playstation, GenericGamepad}
+
 [Serializable]
 public class LocalPlayerData
 {
@@ -10,13 +12,15 @@ public class LocalPlayerData
     public string ControllerScheme { get; private set; }
     public int SelectedSlotIndex { get; private set; } = 0;
     public bool IsReady { get; private set; }
+    public LocalDeviceType DeviceType { get; private set; }
     
-    public LocalPlayerData(int playerIndex, uint inputUserId, string deviceName, string controllerScheme)
+    public LocalPlayerData(int playerIndex, uint inputUserId, string deviceName, string controllerScheme, LocalDeviceType deviceType)
     {
         PlayerIndex = playerIndex;
         InputUserId = inputUserId;
         DeviceName = deviceName;
         ControllerScheme = controllerScheme;
+        DeviceType = deviceType;
         
         SlotIndex = -1;
         IsReady = false;

@@ -1,5 +1,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
+
+[System.Serializable]
+public class DeviceIconEntry
+{
+    public LocalDeviceType deviceType;
+    public Sprite icon;
+}
 
 [RequireComponent(typeof(PlayerInputManager))]
 public class LocalLobbyController : MonoBehaviour
@@ -9,6 +18,9 @@ public class LocalLobbyController : MonoBehaviour
     
     [Header("Interfaz Lobby")]
     [SerializeField] private PlayerSlotUI[] playerSlots;
+    
+    [Header("Imagen de Dispositivos")]
+    [SerializeField] private List<DeviceIconEntry> deviceIcons = new();
 
     private void Awake()
     {
@@ -59,8 +71,9 @@ public class LocalLobbyController : MonoBehaviour
         if (_gameSet == null || playerInput == null) return;
 
         string deviceName = GetDeviceDisplayName(playerInput);
+        LocalDeviceType deviceType = GetDeviceType(playerInput);
 
-        bool registered = _gameSet.TryAddLocalPlayer(playerInput.playerIndex, playerInput.user.id, deviceName, playerInput.currentControlScheme, out LocalPlayerData playerData);
+        bool registered = _gameSet.TryAddLocalPlayer(playerInput.playerIndex, playerInput.user.id, deviceName, playerInput.currentControlScheme, deviceType, out LocalPlayerData playerData);
 
         if (!registered)
         {
@@ -104,6 +117,7 @@ public class LocalLobbyController : MonoBehaviour
         
         if (player == null) return;
         if (player.IsReady) return;
+        if (player.SlotIndex >= 0) return;
         
         player.MoveSelectedSlot(direction, playerSlots.Length);
         RefreshLobbyUI();
@@ -188,13 +202,18 @@ public class LocalLobbyController : MonoBehaviour
             {
                 slotUI.ShowAvailable();
             }
-            else if (occupant.IsReady)
-            {
-                slotUI.ShowReady(occupant);
-            }
             else
             {
-                slotUI.ShowOccupied(occupant);
+                Sprite deviceIcon = GetDeviceIcon(occupant.DeviceType);
+
+                if (occupant.IsReady)
+                {
+                    slotUI.ShowReady(occupant, deviceIcon);
+                }
+                else
+                {
+                    slotUI.ShowOccupied(occupant, deviceIcon);
+                }
             }
             
             slotUI.ShowSelection(false, Color.white);
@@ -247,5 +266,35 @@ public class LocalLobbyController : MonoBehaviour
         }
 
         return "Dispositivo desconocido";
+    }
+
+    private LocalDeviceType GetDeviceType(PlayerInput playerInput)
+    {
+        if (playerInput.currentControlScheme == "Keyboard&Mouse") return LocalDeviceType.KeyboardMouse;
+
+        foreach (InputDevice device in playerInput.devices)
+        {
+            if (device is not Gamepad) continue;
+            
+            string product = device.description.product?.ToLowerInvariant() ?? "";
+            string manufacturer = device.description.manufacturer?.ToLowerInvariant() ?? "";
+            
+            if (product.Contains("xbox") || manufacturer.Contains("microsoft")) return LocalDeviceType.Xbox;
+            
+            if (product.Contains("dualshock") || product.Contains("dualsense") || product.Contains("playstation") || product.Contains("sony")) return LocalDeviceType.Playstation;
+            
+            return LocalDeviceType.GenericGamepad;
+        }
+        
+        return LocalDeviceType.None;
+    }
+
+    private Sprite GetDeviceIcon(LocalDeviceType deviceType)
+    {
+        foreach (DeviceIconEntry entry in deviceIcons)
+        {
+            if (entry.deviceType == deviceType) return entry.icon;
+        }
+        return null;
     }
 }

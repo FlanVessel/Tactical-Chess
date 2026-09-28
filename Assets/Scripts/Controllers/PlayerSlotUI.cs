@@ -8,7 +8,8 @@ public class PlayerSlotUI : MonoBehaviour
     [SerializeField] private TMP_Text playerNumberText;
     [SerializeField] private TMP_Text deviceNameText;
     [SerializeField] private TMP_Text statusText;
-
+    
+    [Header("Imagenes de referencia")]
     [SerializeField] private Image deviceIcon;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Image selectionBorder;
@@ -34,36 +35,41 @@ public class PlayerSlotUI : MonoBehaviour
 
     public void ShowAvailable()
     {
-        if (deviceNameText != null) deviceNameText.text = "Sin dispositivo";
-        if (statusText != null) statusText.text = "DISPONIBLE";
-        if (deviceIcon != null)
-        {
-            deviceIcon.sprite = null;
-            deviceIcon.enabled = false;
-        }
-        if (backgroundImage != null) backgroundImage.color = availableColor;
+        deviceNameText.text = "Sin dispositivo";
+        statusText.text = "DISPONIBLE";
+        
+        deviceIcon.sprite = null;
+        deviceIcon.enabled = false;
+        
+        backgroundImage.color = availableColor;
     }
 
-    public void ShowOccupied(LocalPlayerData playerData, Sprite icon = null)
+    public void ShowOccupied(LocalPlayerData playerData, Sprite icon)
     {
         if (playerData == null) return;
-        if (deviceNameText != null) deviceNameText.text = playerData.DeviceName;
-        if (statusText != null) statusText.text = "PRESIONA CONFIRMAR";
+        deviceNameText.text = playerData.DeviceName;
+        statusText.text = "PRESIONA CONFIRMAR";
+        
+        deviceIcon.sprite = icon;
+        deviceIcon.enabled = icon  != null;
 
         SetDeviceIcon(icon);
 
-        if (backgroundImage != null) backgroundImage.color = occupiedColor;
+        backgroundImage.color = occupiedColor;
     }
 
-    public void ShowReady(LocalPlayerData playerData, Sprite icon = null)
+    public void ShowReady(LocalPlayerData playerData, Sprite icon)
     {
         if (playerData == null) return;
-        if (deviceNameText != null) deviceNameText.text = playerData.DeviceName;
-        if (statusText != null) statusText.text = "LISTO";
+        deviceNameText.text = playerData.DeviceName;
+        statusText.text = "LISTO";
+        
+        deviceIcon.sprite = icon;
+        deviceIcon.enabled = icon != null;
 
         SetDeviceIcon(icon);
 
-        if (backgroundImage != null) backgroundImage.color = readyColor;
+        backgroundImage.color = readyColor;
 
         ShowSelection(false, Color.white);
     }

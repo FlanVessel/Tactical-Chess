@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SocialPlatforms;
 
 public enum GameMode{None, SinglePlayer, LocalMultiPlayer}
 
@@ -27,7 +28,7 @@ public class GameSet : MonoBehaviour
         Debug.Log("Sesion Multijugadorlocal creado");
     }
 
-    public bool TryAddLocalPlayer(int playerIndex,uint inputUserId, string deviceName, string controlScheme, out LocalPlayerData newPlayerData)
+    public bool TryAddLocalPlayer(int playerIndex,uint inputUserId, string deviceName, string controlScheme, LocalDeviceType deviceType, out LocalPlayerData newPlayerData)
     {
         newPlayerData = null;
         
@@ -35,7 +36,7 @@ public class GameSet : MonoBehaviour
         if (_players.Count >= MaxiumLocalPlayerCount) return false;
         if (ContainsInputUser(inputUserId)) return false;
         
-        newPlayerData = new LocalPlayerData(playerIndex, inputUserId, deviceName, controlScheme);
+        newPlayerData = new LocalPlayerData(playerIndex, inputUserId, deviceName, controlScheme, deviceType);
         
         _players.Add(newPlayerData);
         return true;
