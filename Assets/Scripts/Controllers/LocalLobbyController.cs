@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class DeviceIconEntry
@@ -18,6 +18,7 @@ public class LocalLobbyController : MonoBehaviour
     
     [Header("Interfaz Lobby")]
     [SerializeField] private PlayerSlotUI[] playerSlots;
+    [SerializeField] private Button continueBattleButton;
     
     [Header("Imagen de Dispositivos")]
     [SerializeField] private List<DeviceIconEntry> deviceIcons = new();
@@ -39,9 +40,10 @@ public class LocalLobbyController : MonoBehaviour
     private void Start()
     {
         InitialPlayerSlots();
+        UpdateBattleButton();
     }
 
-    private void InitialPlayerSlots()
+    private void InitialPlayerSlots() //Los slots de los jugadores
     {
         for (int i = 0; i < playerSlots.Length; i++)
         {
@@ -66,7 +68,7 @@ public class LocalLobbyController : MonoBehaviour
         _playerInputManager.onPlayerLeft -= HandlePlayerLeft;
     }
 
-    private void HandlePlayerJoined(PlayerInput playerInput)
+    private void HandlePlayerJoined(PlayerInput playerInput) //Cuando se unen o preparar a los jugadores
     {
         if (_gameSet == null || playerInput == null) return;
 
@@ -108,10 +110,15 @@ public class LocalLobbyController : MonoBehaviour
         inputController.SubmitRequested += HandleSubmitRequested;
         inputController.CancelRequested += HandleCancelRequested;
 
+        int initializeSlot = playerInput.playerIndex;
+        
+        if (initializeSlot >= 0 && initializeSlot < playerSlots.Length) playerData.SetSelectedSlot(initializeSlot);
+        RefreshLobbyUI();
+
         Debug.Log($"{deviceName} está esperando seleccionar un espacio." );
     }
     
-    private void HandleNavigateRequested(LocalPlayerInputController inputController, int direction)
+    private void HandleNavigateRequested(LocalPlayerInputController inputController, int direction) //Como podra navegar los jugadores
     {
         LocalPlayerData player = inputController.PlayerData;
         
@@ -123,7 +130,7 @@ public class LocalLobbyController : MonoBehaviour
         RefreshLobbyUI();
     }
 
-    private void HandleSubmitRequested(LocalPlayerInputController inputController)
+    private void HandleSubmitRequested(LocalPlayerInputController inputController) //Cuando lo jugadores aceptan el slot en el que van a jugar
     {
         LocalPlayerData player = inputController.PlayerData;
         
@@ -149,7 +156,7 @@ public class LocalLobbyController : MonoBehaviour
         RefreshLobbyUI();
     }
 
-    private void HandleCancelRequested(LocalPlayerInputController inputController)
+    private void HandleCancelRequested(LocalPlayerInputController inputController) //Cuando los jugadores cancelan el slot
     {
         LocalPlayerData player = inputController.PlayerData;
         
@@ -172,13 +179,14 @@ public class LocalLobbyController : MonoBehaviour
         RefreshLobbyUI();
     }
 
-    private void HandlePlayerLeft(PlayerInput playerInput)
+    private void HandlePlayerLeft(PlayerInput playerInput) //Cuando se desconectan
     {
         if (_gameSet == null || playerInput == null) return;
         _gameSet.RemoveLocalPlayer(playerInput.user.id);
+        RefreshLobbyUI();
     }
 
-    private bool IsSlotOccupied(int slotIndex)
+    private bool IsSlotOccupied(int slotIndex) //Cuando esta ocupado
     {
         foreach (LocalPlayerData player in _gameSet.Players)
         {
@@ -188,7 +196,7 @@ public class LocalLobbyController : MonoBehaviour
         return false;
     }
 
-    private void RefreshLobbyUI()
+    private void RefreshLobbyUI() //refrescamos la UI
     {
         for (int i = 0; i < playerSlots.Length; i++)
         {
@@ -229,9 +237,11 @@ public class LocalLobbyController : MonoBehaviour
             
             playerSlots[selectedSlot].ShowSelection(true, GetPlayerColor(player.PlayerIndex));
         }
+        
+        UpdateBattleButton();
     }
 
-    private LocalPlayerData FindPlayerInSlot(int slotIndex)
+    private LocalPlayerData FindPlayerInSlot(int slotIndex) 
     {
         foreach (LocalPlayerData player in _gameSet.Players)
         {
@@ -296,5 +306,25 @@ public class LocalLobbyController : MonoBehaviour
             if (entry.deviceType == deviceType) return entry.icon;
         }
         return null;
+    }
+
+    private void UpdateBattleButton()
+    {
+        if (continueBattleButton == null) return;
+        continueBattleButton.interactable = CanContinue();
+    }
+
+    public bool CanContinue()
+    {
+        if (_gameSet == null) return false;
+        if (_gameSet.Players.Count < 2) return false;
+
+        foreach (LocalPlayerData player in _gameSet.Players)
+        {
+            if (player == null) return false;
+            if (player.SlotIndex < 0) return false;
+            if (!player.IsReady) return false;
+        }
+        return true;
     }
 }

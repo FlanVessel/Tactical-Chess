@@ -1933,7 +1933,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 963194548}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1534924432}
+        m_TargetAssemblyTypeName: LocalMenuUI, Assembly-CSharp
+        m_MethodName: ContinueButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &963194548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2938,6 +2950,7 @@ MonoBehaviour:
   - {fileID: 1249013930}
   - {fileID: 1963303737}
   - {fileID: 810805708}
+  continueBattleButton: {fileID: 963194547}
   deviceIcons:
   - deviceType: 0
     icon: {fileID: 21300000, guid: 5d0b2d2f91b8fc341b23d63238656ce9, type: 3}
@@ -3252,6 +3265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 259d6d53dd0119d4aaa722940cf2a54a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalMenuUI
+  lobbyController: {fileID: 1418037466}
 --- !u!4 &1534924433
 Transform:
   m_ObjectHideFlags: 0

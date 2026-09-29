@@ -96,6 +96,13 @@ public class GameManager : MonoBehaviour
         LoadScene("LocalBattle");
     }
 
+    public void StartPawnRecruitment()
+    {
+        if (_currentGameState != GameState.LocalLobby) return;
+        ChangeState(GameState.PawnRecruitment);
+        _sceneLoader.LoadScene("PawnRecruitment");
+    }
+
     public void ReturnToMenu()
     {
         if (_gameSet == null) return;

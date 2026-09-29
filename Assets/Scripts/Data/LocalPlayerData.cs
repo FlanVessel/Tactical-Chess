@@ -59,4 +59,10 @@ public class LocalPlayerData
     {
         IsReady = value;
     }
+    
+    public void SetSelectedSlot(int slotIndex)
+    {
+        if (slotIndex < 0) return;
+        SelectedSlotIndex = slotIndex;
+    }
 }
