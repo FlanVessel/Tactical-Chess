@@ -114,6 +114,7 @@ public class LocalLobbyController : MonoBehaviour
         
         if (initializeSlot >= 0 && initializeSlot < playerSlots.Length) playerData.SetSelectedSlot(initializeSlot);
         RefreshLobbyUI();
+        DontDestroyOnLoad(playerInput.gameObject);
 
         Debug.Log($"{deviceName} está esperando seleccionar un espacio." );
     }

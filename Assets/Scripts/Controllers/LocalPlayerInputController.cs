@@ -50,9 +50,9 @@ public class LocalPlayerInputController : MonoBehaviour
 
         _playerData = playerData;
 
-        _navigateAction = _playerInput.actions.FindAction("Lobby/Navigate");
-        _submitAction = _playerInput.actions.FindAction("Lobby/Submit");
-        _cancelAction = _playerInput.actions.FindAction("Lobby/Cancel");
+        _navigateAction = _playerInput.actions.FindAction("UI/Navigate");
+        _submitAction = _playerInput.actions.FindAction("UI/Submit");
+        _cancelAction = _playerInput.actions.FindAction("UI/Cancel");
 
         if (_navigateAction == null || _submitAction == null || _cancelAction == null)
         {
