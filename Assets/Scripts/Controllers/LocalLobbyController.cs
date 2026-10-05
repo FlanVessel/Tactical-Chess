@@ -43,9 +43,28 @@ public class LocalLobbyController : MonoBehaviour
         
         _localInputManager.EnableJoining();
         
-        foreach (LocalPlayerInputController controller in _localInputManager.Players) SubscribePlayer(controller);
+        foreach (LocalPlayerInputController controller in _localInputManager.Players)
+        {
+            PreparePlayersLobby(controller);
+        }
         
         RefreshLobbyUI();
+    }
+
+    private void PreparePlayersLobby(LocalPlayerInputController controller)
+    {
+        if (controller == null) return;
+        
+        SubscribePlayer(controller);
+        LocalPlayerData player = controller.PlayerData;
+        
+        if (player == null) return;
+        if (player.SlotIndex >= 0) return;
+        
+        int availableSlot = FindAvailableSlot();
+        if (availableSlot < 0) return;
+            
+        player.AssignSlot(availableSlot);
     }
 
     private void InitialPlayerSlots() //Los slots de los jugadores
@@ -59,20 +78,25 @@ public class LocalLobbyController : MonoBehaviour
 
     private void OnEnable()
     {
+        if (_localInputManager == null) return;
         _localInputManager.PlayerJoined += HandleInputPlayerJoined;
         _localInputManager.PlayerLeft += HandleInputPlayerLeft;
     }
 
     private void OnDisable()
     {
-        _localInputManager.PlayerJoined -= HandleInputPlayerJoined;
-        _localInputManager.PlayerLeft -= HandleInputPlayerLeft;
+        if (_localInputManager != null)
+        {
+            _localInputManager.PlayerJoined -= HandleInputPlayerJoined;
+            _localInputManager.PlayerLeft -= HandleInputPlayerLeft;
+        }
+        
         UnsubscribePlayersExisting();
     }
 
     private void HandleInputPlayerJoined(LocalPlayerInputController controller)
     {
-        SubscribePlayer(controller);
+        PreparePlayersLobby(controller);
         RefreshLobbyUI();
     }
     
@@ -87,7 +111,6 @@ public class LocalLobbyController : MonoBehaviour
         if (controller == null) return;
         if (!_subscribedPlayers.Add(controller)) return;
         
-        controller.NavigateRequested += HandleNavigateRequested;
         controller.SubmitRequested += HandleSubmitRequested;
         controller.CancelRequested += HandleCancelRequested;
     }
@@ -97,7 +120,6 @@ public class LocalLobbyController : MonoBehaviour
         if (controller == null) return;
         if (!_subscribedPlayers.Remove(controller)) return;
         
-        controller.NavigateRequested -= HandleNavigateRequested;
         controller.SubmitRequested -= HandleSubmitRequested;
         controller.CancelRequested -= HandleCancelRequested;
     }
@@ -109,42 +131,16 @@ public class LocalLobbyController : MonoBehaviour
         
         foreach (LocalPlayerInputController controller in controllers) UnsubscribePlayer(controller);
     }
-    
-    private void HandleNavigateRequested(LocalPlayerInputController inputController, int direction) //Como podra navegar los jugadores
-    {
-        LocalPlayerData player = inputController.PlayerData;
-        
-        if (player == null) return;
-        if (player.IsReady) return;
-        if (player.SlotIndex >= 0) return;
-        
-        player.MoveSelectedSlot(direction, playerSlots.Length);
-        RefreshLobbyUI();
-    }
 
     private void HandleSubmitRequested(LocalPlayerInputController inputController) //Cuando lo jugadores aceptan el slot en el que van a jugar
     {
         LocalPlayerData player = inputController.PlayerData;
         
         if (player == null) return;
-
-        int selectedSlot = player.SelectedSlotIndex;
+        if (player.SlotIndex < 0) return;
+        if (player.IsReady) return;
         
-        if (player.SlotIndex < 0)
-        {
-            if (IsSlotOccupied(selectedSlot))
-            {
-                Debug.Log($"El espacio {selectedSlot + 1} ya esta ocupado.");
-                return;
-            }
-            player.AssignSlot(selectedSlot);
-            Debug.Log($"{player.DeviceName} ocupo el espacio {selectedSlot + 1}.");
-        }
-        else
-        {
-            player.SetReady(true);
-            Debug.Log($"{player.DeviceName} esta listo en {selectedSlot + 1}.");
-        }
+        player.SetReady(true);
         RefreshLobbyUI();
     }
 
@@ -153,21 +149,9 @@ public class LocalLobbyController : MonoBehaviour
         LocalPlayerData player = inputController.PlayerData;
         
         if (player == null) return;
-
-        if (player.IsReady)
-        {
-            player.SetReady(false);
-            Debug.Log($"{player.DeviceName} no esta listo.");
-        }
-        else if (player.SlotIndex >= 0)
-        {
-            player.RealeaseSlot();
-            Debug.Log($"{player.DeviceName} solto su lugar.");
-        }
-        else
-        {
-            Debug.Log($"{player.DeviceName} todavia no tiene un lugar.");
-        }
+        if (!player.IsReady) return;
+        
+        player.SetReady(false);
         RefreshLobbyUI();
     }
 
@@ -183,6 +167,7 @@ public class LocalLobbyController : MonoBehaviour
 
     private void RefreshLobbyUI() //refrescamos la UI
     {
+        if (_gameSet == null) return;
         for (int i = 0; i < playerSlots.Length; i++)
         {
             PlayerSlotUI slotUI = playerSlots[i];
@@ -211,19 +196,18 @@ public class LocalLobbyController : MonoBehaviour
             
             slotUI.ShowSelection(false, Color.white);
         }
-
-        foreach (LocalPlayerData player in _gameSet.Players)
-        {
-            if (player == null || player.IsReady) continue;
-            
-            int selectedSlot = player.SelectedSlotIndex;
-
-            if (selectedSlot < 0 || selectedSlot >= playerSlots.Length) continue;
-            
-            playerSlots[selectedSlot].ShowSelection(true, GetPlayerColor(player.PlayerIndex));
-        }
         
         UpdateBattleButton();
+    }
+
+    private int FindAvailableSlot()
+    {
+        for (int i = 0; i < playerSlots.Length; i++)
+        {
+            if (!IsSlotOccupied(i)) return i;
+        }
+
+        return -1;
     }
 
     private LocalPlayerData FindPlayerInSlot(int slotIndex) 
@@ -234,18 +218,6 @@ public class LocalLobbyController : MonoBehaviour
             if (player.SlotIndex == slotIndex) return player;
         }
         return null;
-    }
-
-    private Color GetPlayerColor(int playerIndex)
-    {
-        return playerIndex switch
-        {
-            0 => Color.cyan,
-            1 => Color.yellow,
-            2 => Color.green,
-            3 => Color.blue,
-            _ => Color.white
-        };
     }
 
     private Sprite GetDeviceIcon(LocalDeviceType deviceType)

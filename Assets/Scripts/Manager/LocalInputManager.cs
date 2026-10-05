@@ -103,17 +103,14 @@ public class LocalInputManager : MonoBehaviour
         if (playerInput == null) return;
         LocalPlayerInputController controller = playerInput.GetComponent<LocalPlayerInputController>();
 
-        if (controller != null)
-        {
-            _players.Remove(controller);
+        if (controller != null) return;
+        
+        bool wasRegistered = _players.Remove(controller);
+        if (!wasRegistered) return;
 
-            if (_gameSet != null && controller.PlayerData != null) _gameSet.RemoveLocalPlayer(controller.PlayerData.InputUserId);
-            
-            PlayerLeft?.Invoke(controller);
-            return;
-        }
-
-        if (_gameSet != null) _gameSet.RemoveLocalPlayer(playerInput.user.id);
+        if (_gameSet != null && controller.PlayerData != null) _gameSet.RemoveLocalPlayer(playerInput.user.id);
+        
+        PlayerLeft?.Invoke(controller);
     }
 
     public void EnableJoining()
@@ -159,5 +156,25 @@ public class LocalInputManager : MonoBehaviour
         }
 
         return LocalDeviceType.None;
+    }
+
+    public void ClearLocalPlayers()
+    {
+        DisableJoining();
+        
+        LocalPlayerInputController[] playersToRemove = new LocalPlayerInputController[_players.Count];
+        _players.CopyTo(playersToRemove, 0);
+        _players.Clear();
+
+        foreach (LocalPlayerInputController controller in playersToRemove)
+        {
+            if (controller == null) continue;
+            
+            LocalPlayerData playerData = controller.PlayerData;
+            
+            if (_gameSet != null && playerData != null) _gameSet.RemoveLocalPlayer(controller.PlayerData.InputUserId);
+            
+            Destroy(controller.gameObject);
+        }
     }
 }
