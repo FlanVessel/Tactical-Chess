@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
@@ -10,11 +9,10 @@ public class DeviceIconEntry
     public Sprite icon;
 }
 
-[RequireComponent(typeof(PlayerInputManager))]
 public class LocalLobbyController : MonoBehaviour
 {
-    private PlayerInputManager _playerInputManager;
     private GameSet _gameSet;
+    private LocalInputManager _localInputManager;
     
     [Header("Interfaz Lobby")]
     [SerializeField] private PlayerSlotUI[] playerSlots;
@@ -22,25 +20,32 @@ public class LocalLobbyController : MonoBehaviour
     
     [Header("Imagen de Dispositivos")]
     [SerializeField] private List<DeviceIconEntry> deviceIcons = new();
+    
+    private readonly HashSet<LocalPlayerInputController> _subscribedPlayers = new();
 
     private void Awake()
     {
-        _playerInputManager = GetComponent<PlayerInputManager>();
-
-        if (GameManager.Instance == null)
-        {
-            Debug.LogError("No existe GameManager. Ejecuta el juego desde Bootstrap.");
-            return;
-        }
-
+        if (GameManager.Instance == null) return;
+        
         _gameSet = GameManager.Instance.Set;
-        if (_gameSet == null) Debug.LogError("GameManager no contiene una GameSession.");
+        _localInputManager = LocalInputManager.Instance;
     }
 
     private void Start()
     {
         InitialPlayerSlots();
-        UpdateBattleButton();
+
+        if (_gameSet == null || _localInputManager == null)
+        {
+            UpdateBattleButton();
+            return;
+        }
+        
+        _localInputManager.EnableJoining();
+        
+        foreach (LocalPlayerInputController controller in _localInputManager.Players) SubscribePlayer(controller);
+        
+        RefreshLobbyUI();
     }
 
     private void InitialPlayerSlots() //Los slots de los jugadores
@@ -54,69 +59,55 @@ public class LocalLobbyController : MonoBehaviour
 
     private void OnEnable()
     {
-        if (_playerInputManager == null) return;
-
-        _playerInputManager.onPlayerJoined += HandlePlayerJoined;
-        _playerInputManager.onPlayerLeft += HandlePlayerLeft;
+        _localInputManager.PlayerJoined += HandleInputPlayerJoined;
+        _localInputManager.PlayerLeft += HandleInputPlayerLeft;
     }
 
     private void OnDisable()
     {
-        if (_playerInputManager == null) return;
-
-        _playerInputManager.onPlayerJoined -= HandlePlayerJoined;
-        _playerInputManager.onPlayerLeft -= HandlePlayerLeft;
+        _localInputManager.PlayerJoined -= HandleInputPlayerJoined;
+        _localInputManager.PlayerLeft -= HandleInputPlayerLeft;
+        UnsubscribePlayersExisting();
     }
 
-    private void HandlePlayerJoined(PlayerInput playerInput) //Cuando se unen o preparar a los jugadores
+    private void HandleInputPlayerJoined(LocalPlayerInputController controller)
     {
-        if (_gameSet == null || playerInput == null) return;
-
-        string deviceName = GetDeviceDisplayName(playerInput);
-        LocalDeviceType deviceType = GetDeviceType(playerInput);
-
-        bool registered = _gameSet.TryAddLocalPlayer(playerInput.playerIndex, playerInput.user.id, deviceName, playerInput.currentControlScheme, deviceType, out LocalPlayerData playerData);
-
-        if (!registered)
-        {
-            Debug.LogWarning("No fue posible registrar al jugador en la sesión." );
-            Destroy(playerInput.gameObject);
-            return;
-        }
-        
-        LocalPlayerInputController inputController = playerInput.GetComponent<LocalPlayerInputController>();
-
-        if (inputController == null)
-        {
-            Debug.LogError($"{playerInput.name} no tiene LocalPlayerInputController.");
-            
-            _gameSet.RemoveLocalPlayer(playerInput.user.id);
-            Destroy(playerInput.gameObject);
-            return;
-        }
-
-        bool config = inputController.Setup(playerData);
-
-        if (!config)
-        {
-            Debug.LogError($"No fue posible configurar la entrada {deviceName}.");
-            
-            _gameSet.RemoveLocalPlayer(playerInput.user.id);
-            Destroy(playerInput.gameObject);
-            return;
-        }
-
-        inputController.NavigateRequested += HandleNavigateRequested;
-        inputController.SubmitRequested += HandleSubmitRequested;
-        inputController.CancelRequested += HandleCancelRequested;
-
-        int initializeSlot = playerInput.playerIndex;
-        
-        if (initializeSlot >= 0 && initializeSlot < playerSlots.Length) playerData.SetSelectedSlot(initializeSlot);
+        SubscribePlayer(controller);
         RefreshLobbyUI();
-        DontDestroyOnLoad(playerInput.gameObject);
+    }
+    
+    private void HandleInputPlayerLeft(LocalPlayerInputController controller)
+    {
+        UnsubscribePlayer(controller);
+        RefreshLobbyUI();
+    }
 
-        Debug.Log($"{deviceName} está esperando seleccionar un espacio." );
+    private void SubscribePlayer(LocalPlayerInputController controller)
+    {
+        if (controller == null) return;
+        if (!_subscribedPlayers.Add(controller)) return;
+        
+        controller.NavigateRequested += HandleNavigateRequested;
+        controller.SubmitRequested += HandleSubmitRequested;
+        controller.CancelRequested += HandleCancelRequested;
+    }
+    
+    private void UnsubscribePlayer(LocalPlayerInputController controller)
+    {
+        if (controller == null) return;
+        if (!_subscribedPlayers.Remove(controller)) return;
+        
+        controller.NavigateRequested -= HandleNavigateRequested;
+        controller.SubmitRequested -= HandleSubmitRequested;
+        controller.CancelRequested -= HandleCancelRequested;
+    }
+
+    private void UnsubscribePlayersExisting()
+    {
+        LocalPlayerInputController[] controllers = new LocalPlayerInputController[_subscribedPlayers.Count];
+        _subscribedPlayers.CopyTo(controllers);
+        
+        foreach (LocalPlayerInputController controller in controllers) UnsubscribePlayer(controller);
     }
     
     private void HandleNavigateRequested(LocalPlayerInputController inputController, int direction) //Como podra navegar los jugadores
@@ -177,13 +168,6 @@ public class LocalLobbyController : MonoBehaviour
         {
             Debug.Log($"{player.DeviceName} todavia no tiene un lugar.");
         }
-        RefreshLobbyUI();
-    }
-
-    private void HandlePlayerLeft(PlayerInput playerInput) //Cuando se desconectan
-    {
-        if (_gameSet == null || playerInput == null) return;
-        _gameSet.RemoveLocalPlayer(playerInput.user.id);
         RefreshLobbyUI();
     }
 
@@ -262,42 +246,6 @@ public class LocalLobbyController : MonoBehaviour
             3 => Color.blue,
             _ => Color.white
         };
-    }
-
-    private string GetDeviceDisplayName(PlayerInput playerInput)
-    {
-        if (playerInput.currentControlScheme == "Keyboard&Mouse") return "Teclado y ratón";
-
-        foreach (InputDevice device in playerInput.devices)
-        {
-            if (device is not Gamepad) continue;
-            if (!string.IsNullOrWhiteSpace(device.description.product)) return device.description.product;
-
-            return device.displayName;
-        }
-
-        return "Dispositivo desconocido";
-    }
-
-    private LocalDeviceType GetDeviceType(PlayerInput playerInput)
-    {
-        if (playerInput.currentControlScheme == "Keyboard&Mouse") return LocalDeviceType.KeyboardMouse;
-
-        foreach (InputDevice device in playerInput.devices)
-        {
-            if (device is not Gamepad) continue;
-            
-            string product = device.description.product?.ToLowerInvariant() ?? "";
-            string manufacturer = device.description.manufacturer?.ToLowerInvariant() ?? "";
-            
-            if (product.Contains("xbox") || manufacturer.Contains("microsoft")) return LocalDeviceType.Xbox;
-            
-            if (product.Contains("dualshock") || product.Contains("dualsense") || product.Contains("playstation") || product.Contains("sony")) return LocalDeviceType.Playstation;
-            
-            return LocalDeviceType.GenericGamepad;
-        }
-        
-        return LocalDeviceType.None;
     }
 
     private Sprite GetDeviceIcon(LocalDeviceType deviceType)
