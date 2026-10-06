@@ -13,6 +13,7 @@ public class LocalPlayerInputController : MonoBehaviour
     private InputAction _cancelAction;
 
     private bool _isConfigured;
+    private bool _navigationLocked;
 
     public PlayerInput PlayerInput => _playerInput;
     public LocalPlayerData PlayerData => _playerData;
@@ -23,7 +24,7 @@ public class LocalPlayerInputController : MonoBehaviour
 
     private void Awake()
     {
-        
+        _playerInput = GetComponent<PlayerInput>();
     }
 
     public bool Setup(LocalPlayerData playerData)
@@ -56,11 +57,12 @@ public class LocalPlayerInputController : MonoBehaviour
 
         if (_navigateAction == null || _submitAction == null || _cancelAction == null)
         {
-            Debug.LogError("No se encontraron las acciones del mapa Lobby.");
+            Debug.LogError("No se encontraron las acciones del Mapa UI.");
             return false;
         }
 
         _navigateAction.performed += HandleNavigate;
+        _navigateAction.canceled += HandleNavigateCanceled;
         _submitAction.performed += HandleSubmit;
         _cancelAction.performed += HandleCancel;
 
@@ -74,11 +76,23 @@ public class LocalPlayerInputController : MonoBehaviour
     {
         Vector2 navigation = context.ReadValue<Vector2>();
 
-        if (Mathf.Abs(navigation.x) < 0.5f) return;
-
-        int direction = navigation.x > 0f ? 1 : -1;
+        if (Mathf.Abs(navigation.y) < 0.5f)
+        {
+            _navigationLocked = false;
+            return;
+        }
+        
+        if (_navigationLocked) return;
+        _navigationLocked = true;
+        
+        int direction = navigation.y > 0f ? 1 : -1;
 
         NavigateRequested?.Invoke(this, direction);
+    }
+
+    private void HandleNavigateCanceled(InputAction.CallbackContext context)
+    {
+        _navigationLocked = false;
     }
 
     private void HandleSubmit(InputAction.CallbackContext context)
@@ -96,6 +110,7 @@ public class LocalPlayerInputController : MonoBehaviour
         if (!_isConfigured) return;
 
         _navigateAction.performed -= HandleNavigate;
+        _navigateAction.canceled -= HandleNavigateCanceled;
         _submitAction.performed -= HandleSubmit;
         _cancelAction.performed -= HandleCancel;
     }

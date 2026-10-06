@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 [System.Serializable]
 public class DeviceIconEntry
@@ -16,7 +17,11 @@ public class LocalLobbyController : MonoBehaviour
     
     [Header("Interfaz Lobby")]
     [SerializeField] private PlayerSlotUI[] playerSlots;
+    [SerializeField] private Button returnButton;
     [SerializeField] private Button continueBattleButton;
+    
+    private Button[] _hostButtons;
+    private int _selectedButtonIndex;
     
     [Header("Imagen de Dispositivos")]
     [SerializeField] private List<DeviceIconEntry> deviceIcons = new();
@@ -35,6 +40,11 @@ public class LocalLobbyController : MonoBehaviour
     {
         InitialPlayerSlots();
 
+        _hostButtons = new Button[] { returnButton, continueBattleButton };
+        _selectedButtonIndex = 1;
+
+        if (EventSystem.current != null) EventSystem.current.sendNavigationEvents = false;
+
         if (_gameSet == null || _localInputManager == null)
         {
             UpdateBattleButton();
@@ -49,6 +59,7 @@ public class LocalLobbyController : MonoBehaviour
         }
         
         RefreshLobbyUI();
+        UpdateHostButtonSelection();
     }
 
     private void PreparePlayersLobby(LocalPlayerInputController controller)
@@ -113,6 +124,10 @@ public class LocalLobbyController : MonoBehaviour
         
         controller.SubmitRequested += HandleSubmitRequested;
         controller.CancelRequested += HandleCancelRequested;
+        
+        LocalPlayerData player = controller.PlayerData;
+
+        if (player != null && player.PlayerIndex == 0) controller.NavigateRequested += HandleHostNavigateRequested;
     }
     
     private void UnsubscribePlayer(LocalPlayerInputController controller)
@@ -122,6 +137,8 @@ public class LocalLobbyController : MonoBehaviour
         
         controller.SubmitRequested -= HandleSubmitRequested;
         controller.CancelRequested -= HandleCancelRequested;
+
+        controller.NavigateRequested -= HandleHostNavigateRequested;
     }
 
     private void UnsubscribePlayersExisting()
@@ -138,10 +155,15 @@ public class LocalLobbyController : MonoBehaviour
         
         if (player == null) return;
         if (player.SlotIndex < 0) return;
-        if (player.IsReady) return;
+        if (!player.IsReady)
+        {
+            player.SetReady(true);
+            RefreshLobbyUI();
+            if (player.PlayerIndex == 0) UpdateHostButtonSelection();
+            return;
+        }
         
-        player.SetReady(true);
-        RefreshLobbyUI();
+        if (player.PlayerIndex == 0) InvokeSelectedHostButton();
     }
 
     private void HandleCancelRequested(LocalPlayerInputController inputController) //Cuando los jugadores cancelan el slot
@@ -153,6 +175,52 @@ public class LocalLobbyController : MonoBehaviour
         
         player.SetReady(false);
         RefreshLobbyUI();
+    }
+
+    private void HandleHostNavigateRequested(LocalPlayerInputController inputController, int direction)
+    {
+        LocalPlayerData player = inputController.PlayerData;
+
+        if (player == null) return;
+        if (player.PlayerIndex != 0) return;
+        if (!player.IsReady) return;
+        if (_hostButtons == null || _hostButtons.Length == 0) return;
+
+        int previousIndex = _selectedButtonIndex;
+
+        do
+        {
+            _selectedButtonIndex += direction;
+
+            if (_selectedButtonIndex < 0)
+            {
+                _selectedButtonIndex = _hostButtons.Length - 1;
+            }
+            else if (_selectedButtonIndex >= _hostButtons.Length)
+            {
+                _selectedButtonIndex = 0;
+            }
+
+            Button candidate = _hostButtons[_selectedButtonIndex];
+
+            if (candidate != null && candidate.interactable) break;
+            
+        }
+        while (_selectedButtonIndex != previousIndex);
+
+        UpdateHostButtonSelection();
+    }
+
+    private void UpdateHostButtonSelection()
+    {
+        if (EventSystem.current == null) return;
+        if (_hostButtons == null || _hostButtons.Length == 0) return;
+        
+        Button selectedButton = _hostButtons[_selectedButtonIndex];
+        
+        if (selectedButton == null) return;
+        
+        EventSystem.current.SetSelectedGameObject(selectedButton.gameObject);
     }
 
     private bool IsSlotOccupied(int slotIndex) //Cuando esta ocupado
@@ -202,10 +270,7 @@ public class LocalLobbyController : MonoBehaviour
 
     private int FindAvailableSlot()
     {
-        for (int i = 0; i < playerSlots.Length; i++)
-        {
-            if (!IsSlotOccupied(i)) return i;
-        }
+        for (int i = 0; i < playerSlots.Length; i++) if (!IsSlotOccupied(i)) return i;
 
         return -1;
     }
@@ -233,6 +298,7 @@ public class LocalLobbyController : MonoBehaviour
     {
         if (continueBattleButton == null) return;
         continueBattleButton.interactable = CanContinue();
+        UpdateHostButtonSelection();
     }
 
     public bool CanContinue()
@@ -247,5 +313,17 @@ public class LocalLobbyController : MonoBehaviour
             if (!player.IsReady) return false;
         }
         return true;
+    }
+
+    private void InvokeSelectedHostButton()
+    {
+        if (_hostButtons == null || _hostButtons.Length == 0) return;
+        
+        Button selectedButton = _hostButtons[_selectedButtonIndex];
+        
+        if (selectedButton == null) return;
+        if (!selectedButton.interactable) return;
+        
+        selectedButton.onClick.Invoke();
     }
 }
