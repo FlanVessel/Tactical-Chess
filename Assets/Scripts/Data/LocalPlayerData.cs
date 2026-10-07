@@ -12,6 +12,7 @@ public class LocalPlayerData
     public string ControllerScheme { get; private set; }
     public bool IsReady { get; private set; }
     public LocalDeviceType DeviceType { get; private set; }
+    public PawnCandidateData RecruitedPawn { get; private set; }
     
     public LocalPlayerData(int playerIndex, uint inputUserId, string deviceName, string controllerScheme, LocalDeviceType deviceType)
     {
@@ -40,5 +41,16 @@ public class LocalPlayerData
     public void SetReady(bool value)
     {
         IsReady = value;
+    }
+    
+    public void RecruitPawn(PawnCandidateData pawn)
+    {
+        if (pawn == null) return;
+        RecruitedPawn = pawn;
+    }
+    
+    public void ClearRecruitedPawn()
+    {
+        RecruitedPawn = null;
     }
 }

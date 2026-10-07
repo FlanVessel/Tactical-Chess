@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 1418037465}
   - component: {fileID: 1418037466}
   m_Layer: 0
-  m_Name: LocalLobbyRoot
+  m_Name: LocalLobbyController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

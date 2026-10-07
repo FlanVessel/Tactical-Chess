@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -83,7 +82,7 @@ public class UnitData : ScriptableObject
 
     public int GenerateMoveRange()
     {
-        return Random.Range(minMoveRange, MaxMoveRange + 1);
+        return Random.Range(minMoveRange, maxMoveRange + 1);
     }
 
     public int GenerateMana()

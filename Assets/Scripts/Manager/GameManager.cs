@@ -111,6 +111,14 @@ public class GameManager : MonoBehaviour
         LoadScene("MainMenu");
     }
 
+    public void ReturnToLocalLobby()
+    {
+        if (_gameSet == null) return;
+        
+        ChangeState(GameState.LocalLobby);
+        LoadScene("LocalLobby");
+    }
+
     private void LoadScene(string sceneName)
     {
         if (_sceneLoader == null)
