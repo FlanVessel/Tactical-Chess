@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class PawnRecruitmentController : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class PawnRecruitmentController : MonoBehaviour
     
     [Header("Interfaz")]
     [SerializeField] private PawnRecruitmentSlotUI[] recruitmentSlots;
+    [SerializeField] private Button continueButton;
+    [SerializeField] private Button returnLocalButton;
+
+    private Button[] _hostButtons;
     
     private readonly Dictionary<uint, PawnCandidateData> _currentCandidates = new();
     private readonly HashSet<LocalPlayerInputController> _subPlayers = new();
@@ -33,6 +38,8 @@ public class PawnRecruitmentController : MonoBehaviour
     private void Start()
     {
         InitializeRecruitmentSlots();
+
+        _hostButtons = new Button[] { returnLocalButton, continueButton };
         
         if (_gameSet == null || _localInputManager == null)
         {
@@ -206,5 +213,25 @@ public class PawnRecruitmentController : MonoBehaviour
         
         PawnRecruitmentSlotUI slot = GetSlotPlayer(player); 
         if (slot != null) slot.ShowConfirmed(player, candidateData);
+    }
+
+    private void UpdateButtonContinue()
+    {
+        if (continueButton == null) return;
+        continueButton.interactable = CanContinue();
+    }
+
+    public bool CanContinue()
+    {
+        if (_gameSet == null) return false;
+        if (_gameSet.Players.Count < 2) return false;
+
+        foreach (LocalPlayerData player in _gameSet.Players)
+        {
+            if (player == null) return false;
+            if (player.SlotIndex < 0) return false;
+            if (!player.IsReady) return false;
+        }
+        return true;
     }
 }

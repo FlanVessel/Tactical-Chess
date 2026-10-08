@@ -59,7 +59,7 @@ public class PawnRecruitmentSlotUI : MonoBehaviour
         _currentCandidate = null;
 
         HideInformation();
-        gameObject.SetActive(false);
+        gameObject.SetActive(true);
     }
 
     public void ShowCandidate(LocalPlayerData player, PawnCandidateData candidate)
@@ -113,15 +113,14 @@ public class PawnRecruitmentSlotUI : MonoBehaviour
 
     public void ShowInformation()
     {
-        if (_currentCandidate == null) return;
-        if (mainPanel != null) mainPanel.SetActive(false);
-        if (informationPanel != null) informationPanel.SetActive(true);
+        mainPanel.SetActive(false);
+        informationPanel.SetActive(true);
     }
 
     public void HideInformation()
     {
-        if (informationPanel != null) informationPanel.SetActive(false);
-        if (mainPanel != null) mainPanel.SetActive(true);
+        informationPanel.SetActive(false);
+        mainPanel.SetActive(true);
     }
 
     private void UpdateInformation(PawnCandidateData candidate)

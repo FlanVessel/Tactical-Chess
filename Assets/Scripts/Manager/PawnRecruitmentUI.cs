@@ -9,4 +9,10 @@ public class PawnRecruitmentUI : MonoBehaviour
         GameManager.Instance.ChangeState(GameState.LocalLobby);
         GameManager.Instance.ReturnToLocalLobby();
     }
+
+    public void ContinueBattleLocal()
+    {
+        if (GameManager.Instance == null) return;
+        GameManager.Instance.StartLocalBattleGame();
+    }
 }

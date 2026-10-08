@@ -393,7 +393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalMenuUI
   lobbyController: {fileID: 1418037466}
-  selectionButton: {fileID: 0}
+  selectionButton: {fileID: 1551947689887680740}
 --- !u!4 &1534924433
 Transform:
   m_ObjectHideFlags: 0

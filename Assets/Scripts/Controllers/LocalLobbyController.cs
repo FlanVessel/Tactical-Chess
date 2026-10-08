@@ -304,7 +304,7 @@ public class LocalLobbyController : MonoBehaviour
     public bool CanContinue()
     {
         if (_gameSet == null) return false;
-        if (_gameSet.Players.Count < 2) return false;
+        if (_gameSet.Players.Count < 1) return false;
 
         foreach (LocalPlayerData player in _gameSet.Players)
         {
