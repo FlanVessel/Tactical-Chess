@@ -10,6 +10,7 @@ public class PawnRecruitmentController : MonoBehaviour
     
     [Header("Peon Random")]
     [SerializeField] private UnitData commonPawnData;
+    [SerializeField] private List<Sprite> pawnSprite = new();
     [SerializeField] private PawnNameData pawnNameData;
     
     [Header("Interfaz")]
@@ -32,6 +33,19 @@ public class PawnRecruitmentController : MonoBehaviour
 
         _gameSet = GameManager.Instance.Set;
         _localInputManager = LocalInputManager.Instance;
+
+        if (commonPawnData == null)
+        {
+            Debug.LogError("PawnRecruitmentController no tiene Common Pawn Data.");
+            return;
+        }
+
+        if (pawnNameData == null)
+        {
+            Debug.LogError("PawnRecruitmentController no tiene Pawn Name Data.");
+            return;
+        }
+        
         _nameProvider = new PawnNameProvider(pawnNameData);
     }
 
@@ -59,7 +73,8 @@ public class PawnRecruitmentController : MonoBehaviour
             
             GeneratedCandidate(player);
         }
-
+        
+        UpdateButtonContinue();
         Debug.Log($"Reclutamiento iniciado con " + $"{_localInputManager.Players.Count} jugadores.");
     }
 
@@ -70,6 +85,9 @@ public class PawnRecruitmentController : MonoBehaviour
             PawnRecruitmentSlotUI slot =  recruitmentSlots[i];
 
             if (slot == null) continue;
+
+            if (i == 0) slot.ConfigureHostButtons(returnLocalButton, continueButton);
+            
             slot.Initialize(i);
             slot.ChangeRequested += HandleSlotChangeRequested;
             slot.ReadyRequested += HandleSlotReadyRequested;
@@ -101,15 +119,24 @@ public class PawnRecruitmentController : MonoBehaviour
         LocalPlayerData player = controller.PlayerData;
 
         if (player == null) return;
-        if (player.RecruitedPawn != null) return;
-
-        Debug.Log($"Jugador {player.PlayerIndex + 1} solicita " + $"{direction} peon.");
+        
+        PawnRecruitmentSlotUI slot = GetSlotPlayer(player);
+        
+        if (slot == null) return;
+        slot.Navigate(direction);
+        
     }
 
     private void HandleSubmitRequested(LocalPlayerInputController controller)
     {
         LocalPlayerData player = controller.PlayerData;
-        ConfirmCandidate(player);
+        
+        if (player == null) return;
+        
+        PawnRecruitmentSlotUI slot = GetSlotPlayer(player);
+
+        if (slot == null) return;
+        slot.SubmitSelection();
     }
 
     private void HandleCancelRequested(LocalPlayerInputController controller)
@@ -117,17 +144,21 @@ public class PawnRecruitmentController : MonoBehaviour
         LocalPlayerData player = controller.PlayerData;
 
         if (player == null) return;
-        if (player.RecruitedPawn == null) return;
-        
-        player.ClearRecruitedPawn();
-        
-        if (!_currentCandidates.TryGetValue(player.InputUserId, out PawnCandidateData candidateData)) return;
         
         PawnRecruitmentSlotUI slot = GetSlotPlayer(player);
         
-        if (slot != null) slot.ShowCandidate(player, candidateData);
+        if (slot == null) return;
+        if (slot.TryCloseInformation()) return;
 
-        Debug.Log($"Jugador {player.PlayerIndex + 1} " + $"cancela su seleccion.");
+        if (player.RecruitedPawn != null)
+        {
+            player.ClearRecruitedPawn();
+            
+            if (_currentCandidates.TryGetValue(player.InputUserId, out PawnCandidateData candidateData)) slot.ShowCandidate(player, candidateData);
+            
+            UpdateButtonContinue();
+            Debug.Log($"Jugador {player.PlayerIndex + 1} " + $"cancela su seleccion.");
+        }
     }
 
     private void OnDisable()
@@ -147,6 +178,14 @@ public class PawnRecruitmentController : MonoBehaviour
         }
     }
 
+    private Sprite GeneratedRandomSprite()
+    {
+        if (pawnSprite == null || pawnSprite.Count == 0) return commonPawnData != null ? commonPawnData.UnitSprite : null;
+        
+        int randomIndex = Random.Range(0, pawnSprite.Count);
+        return pawnSprite[randomIndex];
+    }
+
     private void GeneratedCandidate(LocalPlayerData player)
     {
         if (player == null) return;
@@ -154,8 +193,9 @@ public class PawnRecruitmentController : MonoBehaviour
         if (_nameProvider == null) return;
 
         string generateName = _nameProvider.GetNextName();
+        Sprite generatSprite = GeneratedRandomSprite();
         
-        PawnCandidateData candidateData = PawnCandidateGenerator.Generate(commonPawnData, generateName);
+        PawnCandidateData candidateData = PawnCandidateGenerator.Generate(commonPawnData, generatSprite, generateName);
         
         if (candidateData == null) return;
 
@@ -179,10 +219,18 @@ public class PawnRecruitmentController : MonoBehaviour
 
     private LocalPlayerData FindPlayerBySlot(int slotIndex)
     {
+        if (_gameSet == null) return null;
+        
         foreach (LocalPlayerData player in _gameSet.Players)
         {
             if (player == null) continue;
             if (player.SlotIndex == slotIndex) return player;
+        }
+
+        foreach (LocalPlayerData player in _gameSet.Players)
+        {
+            if (player == null) continue;
+            if (player.PlayerIndex == slotIndex) return player;
         }
         return null;
     }
@@ -207,12 +255,16 @@ public class PawnRecruitmentController : MonoBehaviour
     private void ConfirmCandidate(LocalPlayerData player)
     {
         if (player == null) return;
+        if (player.RecruitedPawn != null) return;
         if (!_currentCandidates.TryGetValue(player.InputUserId, out PawnCandidateData candidateData)) return;
         
         player.RecruitPawn(candidateData);
         
         PawnRecruitmentSlotUI slot = GetSlotPlayer(player); 
+        
         if (slot != null) slot.ShowConfirmed(player, candidateData);
+        
+        UpdateButtonContinue();
     }
 
     private void UpdateButtonContinue()
@@ -229,8 +281,7 @@ public class PawnRecruitmentController : MonoBehaviour
         foreach (LocalPlayerData player in _gameSet.Players)
         {
             if (player == null) return false;
-            if (player.SlotIndex < 0) return false;
-            if (!player.IsReady) return false;
+            if (player.RecruitedPawn == null) return false;
         }
         return true;
     }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PawnNameProvider : MonoBehaviour
+public class PawnNameProvider
 {
     private readonly PawnNameData _nameData;
     private readonly List<string> _availableNames = new();

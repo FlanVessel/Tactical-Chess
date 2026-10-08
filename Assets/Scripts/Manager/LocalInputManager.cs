@@ -103,7 +103,7 @@ public class LocalInputManager : MonoBehaviour
         if (playerInput == null) return;
         LocalPlayerInputController controller = playerInput.GetComponent<LocalPlayerInputController>();
 
-        if (controller != null) return;
+        if (controller == null) return;
         
         bool wasRegistered = _players.Remove(controller);
         if (!wasRegistered) return;

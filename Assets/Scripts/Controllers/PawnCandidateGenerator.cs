@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class PawnCandidateGenerator
 {
-    public static PawnCandidateData Generate(UnitData unitDataBase, string pawnName)
+    public static PawnCandidateData Generate(UnitData unitDataBase, Sprite pawnSprite, string pawnName)
     {
         if (unitDataBase == null) return null;
         
@@ -12,6 +12,6 @@ public static class PawnCandidateGenerator
 
         int recovery = Mathf.Min(unitDataBase.GenerateManaRecovery(), mana);
 
-        return new PawnCandidateData(unitDataBase, pawnName, health, movement, mana, recovery);
+        return new PawnCandidateData(unitDataBase, pawnSprite, pawnName, health, movement, mana, recovery);
     }
 }
