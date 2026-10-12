@@ -1,10 +1,100 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class PerlingMapController : MonoBehaviour
 {
     [Header("Tamaño de mapa")]
-    [SerializeField] private Vector2Int levelX;
-    [SerializeField] private Vector2Int levelY;
+    [SerializeField]private Vector2Int mapSize = new Vector2Int();
+    [SerializeField]private Vector2Int mapOrigin = Vector2Int.zero;
+    
+    [Header("Tipo de Generacion de Mapa")]
+    [SerializeField]private TileBase[] boardTile;
+    [SerializeField]private bool isSingleTile = false;
+    [SerializeField]private TileBase singleTile;
 
+    private Tilemap _boardTilemap;
+
+    private void Start()
+    {
+        CreateIsometricGrid();
+        CheckMap();
+    }
+    
+    private void CreateIsometricGrid()
+    {
+        //Creamos el Grid
+        GameObject gridObject = new GameObject("Grid");
+        //Le agregamos el componente Grid
+        Grid grid = gridObject.AddComponent<Grid>();
+
+        //Configuramos el Grid como Isometrico
+        grid.cellLayout = GridLayout.CellLayout.Isometric;
+
+        grid.cellSize = new Vector3(1f, 0.5f, 1f);
+
+        //Creamos el objeto Tilemap
+        GameObject tilemapObject = new GameObject("BoardTilemap");
+
+        //Hijo del Grid
+        tilemapObject.transform.SetParent(gridObject.transform);
+
+        //Agregamos los componentes Tilemap
+        _boardTilemap = tilemapObject.AddComponent<Tilemap>();
+
+        //Agregamos para que renderize el mapa
+        TilemapRenderer tilemapRenderer = tilemapObject.AddComponent<TilemapRenderer>();
+        tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
+        
+    }
+    
+    private void GenerateBoard()
+    {
+        MapPerlingData map = new MapPerlingData(mapOrigin, mapSize);
+
+        List<Vector3Int> coordinates = map.GenerateCoordinates();
+
+        foreach (Vector3Int coordinate in coordinates)
+        {
+            _boardTilemap.SetTile(coordinate, singleTile);
+        }
+    }
+
+    private void GeneratePerlin()
+    {
+        MapPerlingData map = new MapPerlingData(mapOrigin, mapSize);
+
+        Dictionary<Vector3Int, TerrainType> perlin = map.GenerateTerrain();
+
+        foreach (KeyValuePair<Vector3Int, TerrainType> pair in perlin)
+        {
+            Vector3Int coordinate = pair.Key;
+            TerrainType perlinType = pair.Value;
+
+            TileBase selectedTile = ArrayTileBase(perlinType);
+            
+            _boardTilemap.SetTile(coordinate, selectedTile);
+        }
+    }
+
+    private TileBase ArrayTileBase(TerrainType perlinType)
+    {
+        int indexTerrainType = (int)perlinType;
+        return boardTile[indexTerrainType];
+    }
+
+    private void CheckMap()
+    {
+        if (isSingleTile)
+        {
+            GenerateBoard();
+        }
+        else
+        {
+            GeneratePerlin();
+        }
+        
+    }
 
 }
