@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -15,11 +14,26 @@ public class PerlingMapController : MonoBehaviour
     [SerializeField]private TileBase singleTile;
 
     private Tilemap _boardTilemap;
+    
+    Dictionary<Vector3Int, TerrainType> _perlin;
 
-    private void Start()
+    public void GenerateMap()
     {
         CreateIsometricGrid();
         CheckMap();
+    }
+    
+    private void CheckMap()
+    {
+        if (isSingleTile)
+        {
+            GenerateBoard();
+        }
+        else
+        {
+            GeneratePerlin();
+        }
+        
     }
     
     private void CreateIsometricGrid()
@@ -65,9 +79,9 @@ public class PerlingMapController : MonoBehaviour
     {
         MapPerlingData map = new MapPerlingData(mapOrigin, mapSize);
 
-        Dictionary<Vector3Int, TerrainType> perlin = map.GenerateTerrain();
+        _perlin = map.GenerateTerrain();
 
-        foreach (KeyValuePair<Vector3Int, TerrainType> pair in perlin)
+        foreach (KeyValuePair<Vector3Int, TerrainType> pair in _perlin)
         {
             Vector3Int coordinate = pair.Key;
             TerrainType perlinType = pair.Value;
@@ -84,17 +98,19 @@ public class PerlingMapController : MonoBehaviour
         return boardTile[indexTerrainType];
     }
 
-    private void CheckMap()
+    public bool CellExists(Vector3Int cell)
     {
-        if (isSingleTile)
-        {
-            GenerateBoard();
-        }
-        else
-        {
-            GeneratePerlin();
-        }
-        
+        return _perlin.ContainsKey(cell);
     }
-
+    
+    public bool IsSpawnable(Vector3Int cell)
+    {
+        return _perlin[cell] == TerrainType.Tierra;
+    }
+    
+    public bool IsWalking(Vector3Int cell)
+    {
+        return _perlin[cell] != TerrainType.Obstaculo;
+    } 
+    
 }

@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
         _gameSet.StartSingleplayerSet();
         
         ChangeState(GameState.Battle);
-        LoadScene("TestMapProcedural");
+        LoadScene("PerlinScene");
     }
     
     public void StartLocalMultiplayerGame()
