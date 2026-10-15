@@ -9,7 +9,7 @@ public class MapPerlingData
     private Vector2Int _size;
 
     private int seed = Random.Range(0, 1000000);
-    private float noiseScale = 0.08f;
+    private float noiseScale = 2.08f;
     private float offsetX;
     private float offsetY;
 

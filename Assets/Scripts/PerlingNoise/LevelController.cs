@@ -4,7 +4,7 @@ public class LevelController : MonoBehaviour
 {
     [Header("Control del Mapa")]
     [SerializeField] PerlingMapController perlingMapController;
-    [SerializeField] PerlinBoardOccupancy perlinBoardOccupancy;
+    [SerializeField] PlayerController playerController;
 
     private void Start()
     {
