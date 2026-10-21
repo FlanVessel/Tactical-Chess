@@ -14,6 +14,10 @@ public class PerlingMapController : MonoBehaviour
     [SerializeField]private TileBase singleTile;
 
     private Tilemap _boardTilemap;
+    public Tilemap BoardTilemap => _boardTilemap;
+    
+    private Tilemap _selectionTilemap;
+    public Tilemap SelectionTilemap => _selectionTilemap;
     
     Dictionary<Vector3Int, TerrainType> _perlin;
 
@@ -61,6 +65,16 @@ public class PerlingMapController : MonoBehaviour
         TilemapRenderer tilemapRenderer = tilemapObject.AddComponent<TilemapRenderer>();
         tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
         
+        //Lo mismo de arriba pero solo randerizara el tileselect del PlayerController
+        GameObject selectionObject = new GameObject("SelectionTilemap");
+        selectionObject.transform.SetParent(gridObject.transform);
+        
+        _selectionTilemap = selectionObject.AddComponent<Tilemap>();
+        
+        TilemapRenderer selectionRenderer = selectionObject.AddComponent<TilemapRenderer>();
+        selectionRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
+        selectionRenderer.sortingOrder = 10;
+
     }
     
     private void GenerateBoard()

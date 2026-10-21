@@ -128,7 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 746135750}
-  - component: {fileID: 746135749}
+  - component: {fileID: 746135751}
   - component: {fileID: 746135748}
   m_Layer: 0
   m_Name: ProtoType Selected
@@ -167,32 +167,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &746135749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 746135747}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73719f499f170b94a8a02e1157553933, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PrototipoTileSelected
-  tileBase: {fileID: 11400000, guid: 469d344fa1d980a41b98e04a2b5c0739, type: 2}
-  playerInput: {fileID: 746135748}
-  moveAction:
-    m_Name: Move
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 03505e7d-efb7-404c-a7c4-39ecf9ba9f9c
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-    m_Priority: 0
-  mapSize: {x: 0, y: 0}
-  mapOrigin: {x: 0, y: 0}
 --- !u!4 &746135750
 Transform:
   m_ObjectHideFlags: 0
@@ -208,6 +182,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &746135751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746135747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffe402734f3ada144b5509032104e62f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  _tileBase: {fileID: 11400000, guid: 91dad2b8d5696a2439d7a1ff685022bc, type: 2}
 --- !u!1 &1095277452
 GameObject:
   m_ObjectHideFlags: 0
@@ -428,7 +415,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   perlingMapController: {fileID: 1349793013}
-  playerController: {fileID: 0}
+  playerController: {fileID: 746135751}
+  initialCell: {x: 12, y: 12, z: 0}
 --- !u!4 &1530128570
 Transform:
   m_ObjectHideFlags: 0
