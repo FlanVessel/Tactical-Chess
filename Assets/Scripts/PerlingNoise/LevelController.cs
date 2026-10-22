@@ -7,7 +7,7 @@ public class LevelController : MonoBehaviour
     [SerializeField] PlayerController playerController;
     
     [Header("Inicio del TileSelected")]
-    [SerializeField] private Vector3Int initialCell = new Vector3Int(0, 0, 0);
+    [SerializeField] private Vector3Int initialCell;
 
     private void Start()
     {
