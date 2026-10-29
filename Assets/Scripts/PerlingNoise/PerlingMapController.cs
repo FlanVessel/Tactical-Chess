@@ -73,7 +73,6 @@ public class PerlingMapController : MonoBehaviour
         
         TilemapRenderer selectionRenderer = selectionObject.AddComponent<TilemapRenderer>();
         selectionRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
-        selectionRenderer.sortingOrder = 10;
 
     }
     
