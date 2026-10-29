@@ -18,6 +18,9 @@ public class PerlingMapController : MonoBehaviour
     
     private Tilemap _selectionTilemap;
     public Tilemap SelectionTilemap => _selectionTilemap;
+
+    private Tilemap _highlightTilemap;
+    public Tilemap HightlightTilemap => _highlightTilemap;
     
     Dictionary<Vector3Int, TerrainType> _perlin;
 
@@ -52,7 +55,8 @@ public class PerlingMapController : MonoBehaviour
 
         grid.cellSize = new Vector3(1f, 0.5f, 1f);
 
-        //Creamos el objeto Tilemap
+
+        //Creamos el objeto BoardTilemap
         GameObject tilemapObject = new GameObject("BoardTilemap");
 
         //Hijo del Grid
@@ -64,6 +68,7 @@ public class PerlingMapController : MonoBehaviour
         //Agregamos para que renderize el mapa
         TilemapRenderer tilemapRenderer = tilemapObject.AddComponent<TilemapRenderer>();
         tilemapRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
+
         
         //Lo mismo de arriba pero solo randerizara el tileselect del PlayerController
         GameObject selectionObject = new GameObject("SelectionTilemap");
@@ -73,6 +78,16 @@ public class PerlingMapController : MonoBehaviour
         
         TilemapRenderer selectionRenderer = selectionObject.AddComponent<TilemapRenderer>();
         selectionRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
+
+
+        //Lo mismo pero estamos creando un hightlightTilemap para los tiles que se iluminaran
+        GameObject highlightObject = new GameObject("HighLightTilemap");
+        highlightObject.transform.SetParent(gridObject.transform);
+
+        _highlightTilemap = highlightObject.AddComponent<Tilemap>();
+
+        TilemapRenderer highlightRenderer = highlightObject.AddComponent<TilemapRenderer>();
+        highlightRenderer.sortOrder = TilemapRenderer.SortOrder.TopRight;
 
     }
     
