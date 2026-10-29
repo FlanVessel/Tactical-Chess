@@ -39,6 +39,8 @@ public class PlayerController : MonoBehaviour
         _tilemap = tilemap;
         _cellPosition = cellPosition;
         _config = true;
+        
+        ShowSelection();
     }
 
     private void SelectedMove(InputAction.CallbackContext ctx)
