@@ -462,7 +462,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0834d62d44b5917498127e9c82d056e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spawner
-  pawnPrefab: {fileID: 7046367023855403799, guid: 0fb6ae245223477408836da04ee03f89, type: 3}
+  pawnPrefabs:
+  - {fileID: 7046367023855403799, guid: 0fb6ae245223477408836da04ee03f89, type: 3}
+  - {fileID: 7046367023855403799, guid: 0fb6ae245223477408836da04ee03f89, type: 3}
+  - {fileID: 7046367023855403799, guid: 0fb6ae245223477408836da04ee03f89, type: 3}
+  - {fileID: 7046367023855403799, guid: 0fb6ae245223477408836da04ee03f89, type: 3}
+  enemysPrefabs:
+  - {fileID: 7874699089756622026, guid: 8ee6f2eb6a1e17440bd68b5e92253323, type: 3}
+  - {fileID: 7874699089756622026, guid: 8ee6f2eb6a1e17440bd68b5e92253323, type: 3}
+  - {fileID: 7874699089756622026, guid: 8ee6f2eb6a1e17440bd68b5e92253323, type: 3}
+  - {fileID: 7874699089756622026, guid: 8ee6f2eb6a1e17440bd68b5e92253323, type: 3}
   unitOffset: {x: 0, y: 0, z: 0}
 --- !u!4 &1706619100
 Transform:

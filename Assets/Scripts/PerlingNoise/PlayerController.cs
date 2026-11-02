@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
         _moveAction.performed -= SelectedMove;
     }
 
-    public void Config(PerlingMapController perlingMapController, Tilemap selectedTilemap, Vector3Int cellPosition)
+    public void ConfigPlayer(PerlingMapController perlingMapController, Tilemap selectedTilemap, Vector3Int cellPosition)
     {
         _mapController = perlingMapController;
         _selectedTilemap = selectedTilemap;

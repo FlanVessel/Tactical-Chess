@@ -152,6 +152,28 @@ public class PerlingMapController : MonoBehaviour
 
         return spawnableCells;
     }
+
+    public bool IsSpawnableEnemy(Vector3Int cell)
+    {
+        if (!_perlin.TryGetValue(cell, out TerrainType terrainType))
+        {
+            return false;
+        }
+        
+        return terrainType == TerrainType.Montana;
+    }
+
+    public List<Vector3Int> SpawnCellEnemy()
+    {
+        List<Vector3Int> spawnableCellsEnemy = new List<Vector3Int>();
+
+        foreach (Vector3Int cells in _perlin.Keys)
+        {
+            if (IsSpawnableEnemy(cells)) spawnableCellsEnemy.Add(cells);
+        }
+
+        return spawnableCellsEnemy;
+    }
     
     public bool IsWalking(Vector3Int cell)
     {

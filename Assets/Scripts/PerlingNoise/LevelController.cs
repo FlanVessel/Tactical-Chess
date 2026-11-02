@@ -18,8 +18,10 @@ public class LevelController : MonoBehaviour
     private void LoadLevelMap()
     {
         perlingMapController.GenerateMap();
-        playerController.Config(perlingMapController, perlingMapController.SelectionTilemap, initialCell);
+        
+        playerController.ConfigPlayer(perlingMapController, perlingMapController.SelectionTilemap, initialCell);
+        
         spawnerController.ConfigSpawner(perlingMapController);
-        spawnerController.SpawnFirstPawn();
+        spawnerController.SpawnAll();
     }
 }
