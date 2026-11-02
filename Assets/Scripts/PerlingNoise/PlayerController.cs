@@ -18,8 +18,7 @@ public class PlayerController : MonoBehaviour
     
     private Tilemap _selectedTilemap;
     private Tilemap _hightlightTilemap;
-
-    private bool _config;
+    
 
     private void Awake()
     {
@@ -43,7 +42,6 @@ public class PlayerController : MonoBehaviour
         _mapController = perlingMapController;
         _selectedTilemap = selectedTilemap;
         _cellPosition = cellPosition;
-        _config = true;
         
         ShowSelection();
     }

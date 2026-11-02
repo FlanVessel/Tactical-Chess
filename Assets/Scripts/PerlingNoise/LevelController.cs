@@ -5,6 +5,7 @@ public class LevelController : MonoBehaviour
     [Header("Control del Mapa")]
     [SerializeField] PerlingMapController perlingMapController;
     [SerializeField] PlayerController playerController;
+    [SerializeField] private Spawner spawnerController;
     
     [Header("Inicio del TileSelected")]
     [SerializeField] private Vector3Int initialCell;
@@ -18,5 +19,7 @@ public class LevelController : MonoBehaviour
     {
         perlingMapController.GenerateMap();
         playerController.Config(perlingMapController, perlingMapController.SelectionTilemap, initialCell);
+        spawnerController.ConfigSpawner(perlingMapController);
+        spawnerController.SpawnFirstPawn();
     }
 }

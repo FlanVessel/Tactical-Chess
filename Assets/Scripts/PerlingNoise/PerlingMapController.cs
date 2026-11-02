@@ -133,7 +133,24 @@ public class PerlingMapController : MonoBehaviour
     
     public bool IsSpawnable(Vector3Int cell)
     {
-        return _perlin[cell] == TerrainType.Tierra;
+        if (!_perlin.TryGetValue(cell, out TerrainType terrainType))
+        {
+            return false;
+        }
+        
+        return terrainType == TerrainType.Tierra;
+    }
+
+    public List<Vector3Int> SpawnCell()
+    {
+        List<Vector3Int> spawnableCells = new List<Vector3Int>();
+
+        foreach (Vector3Int cells in _perlin.Keys)
+        {
+            if (IsSpawnable(cells)) spawnableCells.Add(cells);
+        }
+
+        return spawnableCells;
     }
     
     public bool IsWalking(Vector3Int cell)

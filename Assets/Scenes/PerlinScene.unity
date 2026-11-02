@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffe402734f3ada144b5509032104e62f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _tileBase: {fileID: 11400000, guid: 91dad2b8d5696a2439d7a1ff685022bc, type: 2}
+  _selectedTileBase: {fileID: 11400000, guid: 91dad2b8d5696a2439d7a1ff685022bc, type: 2}
 --- !u!1 &1095277452
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,6 +416,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   perlingMapController: {fileID: 1349793013}
   playerController: {fileID: 746135751}
+  spawnerController: {fileID: 1706619099}
   initialCell: {x: 12, y: 12, z: 0}
 --- !u!4 &1530128570
 Transform:
@@ -427,6 +428,52 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.41422, y: 6.09158, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1706619098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1706619100}
+  - component: {fileID: 1706619099}
+  m_Layer: 0
+  m_Name: Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1706619099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706619098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0834d62d44b5917498127e9c82d056e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Spawner
+  pawnPrefab: {fileID: 7046367023855403799, guid: 0fb6ae245223477408836da04ee03f89, type: 3}
+  unitOffset: {x: 0, y: 0, z: 0}
+--- !u!4 &1706619100
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706619098}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.95668, y: 5.68733, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -620,6 +667,7 @@ SceneRoots:
   - {fileID: 1095277455}
   - {fileID: 1530128570}
   - {fileID: 1349793012}
+  - {fileID: 1706619100}
   - {fileID: 746135750}
   - {fileID: 1801678707}
   - {fileID: 1812206405}
