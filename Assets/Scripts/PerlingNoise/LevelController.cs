@@ -3,9 +3,10 @@ using UnityEngine;
 public class LevelController : MonoBehaviour
 {
     [Header("Control del Mapa")]
-    [SerializeField] PerlingMapController perlingMapController;
-    [SerializeField] PlayerController playerController;
+    [SerializeField] private PerlingMapController perlingMapController;
+    [SerializeField] private PlayerController playerController;
     [SerializeField] private Spawner spawnerController;
+    [SerializeField] private PerBoardOccupancy perBoardOccupancy;
     
     [Header("Inicio del TileSelected")]
     [SerializeField] private Vector3Int initialCell;
@@ -19,9 +20,9 @@ public class LevelController : MonoBehaviour
     {
         perlingMapController.GenerateMap();
         
-        playerController.ConfigPlayer(perlingMapController, perlingMapController.SelectionTilemap, initialCell);
+        playerController.ConfigPlayer(perlingMapController, perlingMapController.SelectionTilemap, initialCell, perBoardOccupancy);
         
-        spawnerController.ConfigSpawner(perlingMapController);
+        spawnerController.ConfigSpawner(perlingMapController, perBoardOccupancy);
         spawnerController.SpawnAll();
     }
 }

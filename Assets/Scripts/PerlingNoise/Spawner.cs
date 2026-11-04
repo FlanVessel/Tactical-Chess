@@ -14,11 +14,13 @@ public class Spawner : MonoBehaviour
     
     private PerlingMapController _mapController;
     private Tilemap _boardTilemap;
+    private PerBoardOccupancy _perBoardOccupancy;
     
-    public void ConfigSpawner(PerlingMapController mapController)
+    public void ConfigSpawner(PerlingMapController mapController, PerBoardOccupancy perBoardOccupancy)
     {
         _mapController = mapController;
         _boardTilemap = mapController.BoardTilemap;
+        _perBoardOccupancy = perBoardOccupancy;
     }
 
     public void SpawnAll()
@@ -40,6 +42,10 @@ public class Spawner : MonoBehaviour
             Vector3 worldPosition = _boardTilemap.GetCellCenterWorld(selectedCell);
             
             GameObject spawnedPawn = Instantiate(pawn, worldPosition, Quaternion.identity);
+
+            PerUnitPawn unitPawn = spawnedPawn.GetComponent<PerUnitPawn>();
+            unitPawn.Initialize(selectedCell);
+            bool pawnRegistered = _perBoardOccupancy.RegisterUnit(unitPawn, selectedCell);
             
             availableSpawnCells.RemoveAt(randomNumber);
         }
@@ -55,6 +61,10 @@ public class Spawner : MonoBehaviour
             Vector3 worldPosition = _boardTilemap.GetCellCenterWorld(selectedCell);
             
             GameObject spawnedEnemies = Instantiate(enemy, worldPosition, Quaternion.identity);
+
+            PerUnitEnemy unitEnemy = spawnedEnemies.GetComponent<PerUnitEnemy>();
+            unitEnemy.Initialize(selectedCell);
+            bool enemyRegistered = _perBoardOccupancy.RegisterUnit(unitEnemy, selectedCell);
             
             spawnableCells.RemoveAt(randomNumber);
         }

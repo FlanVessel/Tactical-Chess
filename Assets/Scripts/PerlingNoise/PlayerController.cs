@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TileBase _selectedTileBase;
     
     private PerlingMapController _mapController;
+    private PerBoardOccupancy _perBoardOccupancy;
     
     private Vector3Int _cellPosition;
     
@@ -19,6 +20,11 @@ public class PlayerController : MonoBehaviour
     private Tilemap _selectedTilemap;
     private Tilemap _hightlightTilemap;
     
+    private PerUnitPawn _selectedPawn;
+
+    private bool _movementLocked;
+    
+    public PerUnitPawn SelectedPawn => _selectedPawn;
 
     private void Awake()
     {
@@ -30,54 +36,69 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         _moveAction.performed += SelectedMove;
+        _moveAction.canceled += MoveCancel;
+
+        _confirmAction.performed += ConfirmSelection;
     }
 
     private void OnDisable()
     {
         _moveAction.performed -= SelectedMove;
+        _moveAction.canceled -= MoveCancel;
+        
+        _confirmAction.performed -= ConfirmSelection;
     }
 
-    public void ConfigPlayer(PerlingMapController perlingMapController, Tilemap selectedTilemap, Vector3Int cellPosition)
+    public void ConfigPlayer(PerlingMapController perlingMapController, Tilemap selectedTilemap, Vector3Int cellPosition, PerBoardOccupancy perBoardOccupancy)
     {
         _mapController = perlingMapController;
         _selectedTilemap = selectedTilemap;
         _cellPosition = cellPosition;
+        _perBoardOccupancy = perBoardOccupancy;
         
         ShowSelection();
     }
 
     private void SelectedMove(InputAction.CallbackContext ctx)
     {
+        if (_movementLocked) return;
+        
         Vector2 input = ctx.ReadValue<Vector2>();
+        float miniumInput = 0.5f;
         Vector3Int direction = Vector3Int.zero;
 
-        if (input.x > 0f)
+        if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
         {
-            direction = Vector3Int.right;
+            if (input.x > miniumInput)
+            {
+                direction = Vector3Int.right;
+            }
+            else if (input.x < -miniumInput)
+            {
+                direction = Vector3Int.left;
+            }
         }
-        else if (input.x < 0f)
+        else
         {
-            direction = Vector3Int.left;
-        }
-        else if (input.y > 0f)
-        {
-            direction = Vector3Int.up;
-        }
-        else if (input.y < 0f)
-        {
-            direction = Vector3Int.down;
+            if (input.y > miniumInput)
+            {
+                direction = Vector3Int.up;
+            }
+            else if (input.y < -miniumInput)
+            {
+                direction = Vector3Int.down;
+            }
         }
         
-        TryOtherSelection(direction);
-    }
+        if (direction == Vector3Int.zero) return;
+        
+        _movementLocked  = true;
+        
+        Vector3Int cell = _cellPosition + direction;
 
-    private void TryOtherSelection(Vector3Int direction)
-    {
-        Vector3Int Cell = _cellPosition + direction;
-
-        if (_mapController.CellExists(Cell))
-        { 
-            _cellPosition = Cell; 
+        if (_mapController.CellExists(cell))
+        {
+            _cellPosition = cell;
             ShowSelection();
         }
     }
@@ -86,6 +107,31 @@ public class PlayerController : MonoBehaviour
     {
         _selectedTilemap.ClearAllTiles();
         _selectedTilemap.SetTile(_cellPosition, _selectedTileBase);
+    }
+
+    private void MoveCancel(InputAction.CallbackContext ctx)
+    {
+        _movementLocked = false;
+    }
+
+    private void ConfirmSelection(InputAction.CallbackContext ctx)
+    {
+        PerUnit perUnitAtCell = _perBoardOccupancy.UnitAt(_cellPosition);
+        if (perUnitAtCell == null)
+        {
+            Debug.Log($"No existe ninguna unidad en {_cellPosition}");
+            return;
+        }
+        
+        PerUnitPawn perUnitPawnAtCell = perUnitAtCell as PerUnitPawn;
+        if (perUnitPawnAtCell == null)
+        {
+            Debug.Log($"La unidad en {_cellPosition} no es un peon");
+            return;
+        }
+
+        _selectedPawn = perUnitPawnAtCell;
+        Debug.Log($"Peon : {_selectedPawn}. " + $"Cell: {_selectedPawn.CurrentCell}.");
     }
     
 }
