@@ -131,7 +131,7 @@ public class PerlingMapController : MonoBehaviour
         return _perlin.ContainsKey(cell);
     }
     
-    public bool IsSpawnable(Vector3Int cell) //es relamente spawnable para enemigo en Tile Tierra
+    public bool IsSpawnable(Vector3Int cell) //spawnable para enemigo en Tile Tierra
     {
         if (!_perlin.TryGetValue(cell, out TerrainType terrainType))
         {
@@ -153,7 +153,7 @@ public class PerlingMapController : MonoBehaviour
         return spawnableCells;
     }
 
-    public bool IsSpawnableEnemy(Vector3Int cell) //es relamente spawnable para enemigo en Tile Montana
+    public bool IsSpawnableEnemy(Vector3Int cell) //spawnable para enemigo en Tile Montana
     {
         if (!_perlin.TryGetValue(cell, out TerrainType terrainType))
         {
@@ -174,10 +174,4 @@ public class PerlingMapController : MonoBehaviour
 
         return spawnableCellsEnemy;
     }
-    
-    public bool IsWalking(Vector3Int cell)
-    {
-        return _perlin[cell] != TerrainType.Obstaculo;
-    } 
-    
 }

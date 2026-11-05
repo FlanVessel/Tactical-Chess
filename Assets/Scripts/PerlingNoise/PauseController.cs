@@ -45,15 +45,11 @@ public class PauseController : MonoBehaviour
         {
             _isPaused = false;
             pauseMenu.SetActive(false);
-            EventSystem.current.SetSelectedGameObject(null);
-            Time.timeScale = 1f;
-            _playerInput.SwitchCurrentActionMap("Player");
         }
         else
         {
             _isPaused = true;
             pauseMenu.SetActive(true);
-            Time.timeScale = 0f;
             _playerInput.SwitchCurrentActionMap("UI");
             EventSystem.current.SetSelectedGameObject(continueButton.gameObject);
         }

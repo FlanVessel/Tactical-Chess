@@ -13,8 +13,6 @@ public class Spawner : MonoBehaviour
     
     [Header("Prefabs Enemigos")]
     [SerializeField] private List<GameObject> enemysPrefabs;
-
-    [SerializeField] private Vector3 unitOffset;
     
     private PerlingMapController _mapController;
     private Tilemap _boardTilemap;
