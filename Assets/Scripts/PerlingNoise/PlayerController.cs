@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("TileBase de Selected")] 
-    [SerializeField] private TileBase _selectedTileBase;
+    [SerializeField] private TileBase selectedTileBase;
     
     private PerlingMapController _mapController;
     private PerBoardOccupancy _perBoardOccupancy;
@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour
     private void ShowSelection()
     {
         _selectedTilemap.ClearAllTiles();
-        _selectedTilemap.SetTile(_cellPosition, _selectedTileBase);
+        _selectedTilemap.SetTile(_cellPosition, selectedTileBase);
     }
 
     private void MoveCancel(InputAction.CallbackContext ctx)
@@ -133,5 +133,5 @@ public class PlayerController : MonoBehaviour
         _selectedPawn = perUnitPawnAtCell;
         Debug.Log($"Peon : {_selectedPawn}. " + $"Cell: {_selectedPawn.CurrentCell}.");
     }
-    
+
 }

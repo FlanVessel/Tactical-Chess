@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LevelController : MonoBehaviour
 {
-    [Header("Control del Mapa")]
+    [Header("Referencias para cargar el nivel")]
     [SerializeField] private PerlingMapController perlingMapController;
     [SerializeField] private PlayerController playerController;
     [SerializeField] private Spawner spawnerController;

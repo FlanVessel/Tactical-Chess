@@ -4,6 +4,10 @@ using UnityEngine.Tilemaps;
 
 public class Spawner : MonoBehaviour
 {
+    [Header("Estadisticas")] 
+    [SerializeField] private PerUnitStatsData pawnStatsData;
+    [SerializeField] private PerUnitStatsData enemyStatsData;
+    
     [Header("Prefabs Peones")]
     [SerializeField] private List<GameObject> pawnPrefabs;
     
@@ -44,7 +48,7 @@ public class Spawner : MonoBehaviour
             GameObject spawnedPawn = Instantiate(pawn, worldPosition, Quaternion.identity);
 
             PerUnitPawn unitPawn = spawnedPawn.GetComponent<PerUnitPawn>();
-            unitPawn.Initialize(selectedCell);
+            unitPawn.Initialize(selectedCell, pawnStatsData);
             bool pawnRegistered = _perBoardOccupancy.RegisterUnit(unitPawn, selectedCell);
             
             availableSpawnCells.RemoveAt(randomNumber);
@@ -63,7 +67,7 @@ public class Spawner : MonoBehaviour
             GameObject spawnedEnemies = Instantiate(enemy, worldPosition, Quaternion.identity);
 
             PerUnitEnemy unitEnemy = spawnedEnemies.GetComponent<PerUnitEnemy>();
-            unitEnemy.Initialize(selectedCell);
+            unitEnemy.Initialize(selectedCell, enemyStatsData);
             bool enemyRegistered = _perBoardOccupancy.RegisterUnit(unitEnemy, selectedCell);
             
             spawnableCells.RemoveAt(randomNumber);
