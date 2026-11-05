@@ -131,7 +131,7 @@ public class PerlingMapController : MonoBehaviour
         return _perlin.ContainsKey(cell);
     }
     
-    public bool IsSpawnable(Vector3Int cell) //spawnable para enemigo en Tile Tierra
+    public bool IsSpawnable(Vector3Int cell) //spawnable para peon en Tile Tierra
     {
         if (!_perlin.TryGetValue(cell, out TerrainType terrainType))
         {
